@@ -1,3 +1,4 @@
+import random
 import webbrowser
 from tkinter import *
 from tkinter import font
@@ -58,6 +59,54 @@ def player_callback(frame):
 
 def pc_callback(frame):
     clear_frame(frame)
+
+
+def color_coosing():
+    a = random.randint(1, 9)
+    b = random.randint(1, 9)
+    while b == a or (a == 1 and b == 2) or (a == 2 and b == 3) or (a == 2 and b == 1) or (a == 3 and b == 2):
+        b = random.randint(1, 9)
+
+    if a == 1:
+        path_a = "assets/blue.png"
+    elif a == 2:
+        path_a = "assets/light-blue.png"
+    elif a == 3:
+        path_a = "assets/grey.png"
+    elif a == 4:
+        path_a = "assets/black.png"
+    elif a == 5:
+        path_a = "assets/brown.png"
+    elif a == 6:
+        path_a = "assets/green.png"
+    elif a == 7:
+        path_a = "assets/purple.png"
+    elif a == 8:
+        path_a = "assets/red.png"
+    else:
+        path_a = "assets/white.png"
+
+    if b == 1:
+        path_b = "assets/blue.png"
+    elif b == 2:
+        path_b = "assets/light-blue.png"
+    elif b == 3:
+        path_b = "assets/grey.png"
+    elif b == 4:
+        path_b = "assets/black.png"
+    elif b == 5:
+        path_b = "assets/brown.png"
+    elif b == 6:
+        path_b = "assets/green.png"
+    elif b == 7:
+        path_b = "assets/purple.png"
+    elif b == 8:
+        path_b = "assets/red.png"
+    else:
+        path_b = "assets/white.png"
+
+    color_path = [path_a, path_b]
+    return color_path
 
 
 if __name__ == '__main__':
