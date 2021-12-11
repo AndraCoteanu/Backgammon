@@ -1,8 +1,6 @@
-import time
 import webbrowser
 from tkinter import *
 from tkinter import font
-
 import game as game
 import utils
 
@@ -61,9 +59,7 @@ def player_callback(frame):
     background = PhotoImage(file="assets/board2.png")
     canvas.create_image(0, 0, image=background, anchor=NW)
 
-    # st-dr, sus-jos, img
-    # +70
-    utile = utils.Utils()
+    utile = utils.Utils(canvas)
     board = utile.init_board()
     color_path = utile.color_coosing()
     joc = game.Game(board, color_path, canvas, "2")
@@ -83,16 +79,11 @@ def pc_callback(frame):
     background = PhotoImage(file="assets/board2.png")
     canvas.create_image(0, 0, image=background, anchor=NW)
 
-    # st-dr, sus-jos, img
-    # +70
-
-    utile = utils.Utils()
+    utile = utils.Utils(canvas)
     board = utile.init_board()
     color_path = utile.color_coosing()
     joc = game.Game(board, color_path, canvas, "pc")
     joc.show_board()
-
-
 
     window.mainloop()
 

@@ -1,8 +1,10 @@
 import random
+from tkinter import *
+
 
 class Utils:
-    def __init__(self):
-        ceva = 0
+    def __init__(self, canvas):
+        self.canvas = canvas
 
     def init_board_player1(self):
         # de retinut !! maxim 350 pixeli dimensiunea pentru o coloana
@@ -58,24 +60,24 @@ class Utils:
         coloana = [[], 1000, 770]
         board_player1.append(coloana)
 
-        board_player1[5][0].append(1)
-        board_player1[5][0].append(1)
-        board_player1[5][0].append(1)
-        board_player1[5][0].append(1)
-        board_player1[5][0].append(1)
+        board_player1[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[5][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player1[7][0].append(1)
-        board_player1[7][0].append(1)
-        board_player1[7][0].append(1)
+        board_player1[7][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[7][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[7][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player1[12][0].append(1)
-        board_player1[12][0].append(1)
-        board_player1[12][0].append(1)
-        board_player1[12][0].append(1)
-        board_player1[12][0].append(1)
+        board_player1[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[12][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player1[23][0].append(1)
-        board_player1[23][0].append(1)
+        board_player1[23][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player1[23][0].append(self.canvas.create_window(0, 0, window=Button()))
 
         return board_player1
 
@@ -130,24 +132,24 @@ class Utils:
         coloana = [[], 1000, 40]
         board_player2.append(coloana)
 
-        board_player2[5][0].append(2)
-        board_player2[5][0].append(2)
-        board_player2[5][0].append(2)
-        board_player2[5][0].append(2)
-        board_player2[5][0].append(2)
+        board_player2[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[5][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[5][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player2[7][0].append(2)
-        board_player2[7][0].append(2)
-        board_player2[7][0].append(2)
+        board_player2[7][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[7][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[7][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player2[12][0].append(2)
-        board_player2[12][0].append(2)
-        board_player2[12][0].append(2)
-        board_player2[12][0].append(2)
-        board_player2[12][0].append(2)
+        board_player2[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[12][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[12][0].append(self.canvas.create_window(0, 0, window=Button()))
 
-        board_player2[23][0].append(2)
-        board_player2[23][0].append(2)
+        board_player2[23][0].append(self.canvas.create_window(0, 0, window=Button()))
+        board_player2[23][0].append(self.canvas.create_window(0, 0, window=Button()))
 
         return board_player2
 

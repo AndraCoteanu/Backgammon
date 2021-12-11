@@ -1,5 +1,4 @@
 import random
-import time
 from tkinter import *
 from tkinter import font
 
@@ -80,11 +79,13 @@ class Game:
             for j in range(0, len(board[i][0])):  # elementele din fiecare coloana
                 btn = Button(text="", image=self.image[id - 1], relief=FLAT, borderwidth=0)
                 if i <= 11:
-                    button_window = self.canvas.create_window(board[i][1], board[i][2] + poz[id - 1][0] * j,
-                                                              window=btn)
+                    self.canvas.delete(board[i][0][j])
+                    board[i][0][j] = self.canvas.create_window(board[i][1], board[i][2] + poz[id - 1][0] * j,
+                                                               window=btn)
                 elif i > 11:
-                    button_window = self.canvas.create_window(board[i][1], board[i][2] + poz[id - 1][1] * j,
-                                                              window=btn)
+                    self.canvas.delete(board[i][0][j])
+                    board[i][0][j] = self.canvas.create_window(board[i][1], board[i][2] + poz[id - 1][1] * j,
+                                                               window=btn)
 
     def show_board(self):
         self.show_player_board(1, self.color[0], self.board_1)
@@ -94,7 +95,6 @@ class Game:
         btn = Button(text="Roll", bg='#4e555f', fg='white', relief=FLAT, borderwidth=1, font=text_font,
                      command=lambda: self.roll_dice())
         button_window = self.canvas.create_window(380, 400, window=btn)
-
         self.show_player_stats()
 
     def roll_dice(self):
