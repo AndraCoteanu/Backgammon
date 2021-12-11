@@ -22,6 +22,7 @@ After more testing of the GUI I changed the dimmensions. After starting a game t
 - on the left and right side of the screen we can see each player's statistics: name, color, how many pieces the other player took out and how many pieces he mananged to take out so far
 - on the screen is the actuall board with the pieces
 - in the center of the board, on the left side is the "roll" button, to roll the dice and on the right side we can see what we rolled
+- unfortunatelly, tkinter doesn't understand transparent background for labels and buttons (but at least it helps to see the pieces more clearer)
 
 
 Disclaimer: all UI/UX used was found in a form or another on the internet and I altered and edited it based on my and the project needs.
