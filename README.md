@@ -26,4 +26,9 @@ After more testing of the GUI I changed the dimmensions. After starting a game t
 - unfortunatelly, tkinter doesn't understand transparent background for labels and buttons (but at least it helps to see the pieces more clearer)
 
 
+
+![image](https://user-images.githubusercontent.com/72747266/147503518-69ba33c4-cdeb-41f3-b4fc-5d399772eed8.png)
+
+
+
 Disclaimer: all UI/UX used was found in a form or another on the internet and I altered and edited it based on my and the project needs.
