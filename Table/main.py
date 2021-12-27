@@ -2,12 +2,283 @@ import random
 import webbrowser
 import tkinter as tk
 from time import sleep
-from tkinter import font
+from tkinter import font, CENTER, messagebox
 from typing import List
-from player import Player
-
 
 # TO DO: adauga comentarii si ctrl+alt+l
+
+# 0 = jucator 1; 1 = jucator 2 / pc
+turn = 0
+dice = []
+
+
+class Player:
+    def __init__(self, main_frame, jucator1, jucator2) -> None:
+        self.name = [jucator1, jucator2]
+        self.stats = [[0, 0], [0, 0]]
+        self.color = self.color_choosing()
+        self.label_list = self.show_player_info(main_frame, self.name, self.color)
+        self.show_player_stats(main_frame, self.stats)
+        self.board = self.init_board(main_frame, self.color)
+
+    def show_player_info(self, main_frame, player, color):
+        label_id = 0
+        label_mini_list: List[tk.Label] = []
+
+        text_font = font.Font(size=17)
+
+        label_mini_list.append(tk.Label(main_frame, text=player[0], fg='white', bg='#655f6a', font=text_font))
+        label_mini_list[label_id].place(x=15, y=50)
+        label_id += 1
+
+        label_mini_list.append(tk.Label(main_frame, text=player[1], fg='white', bg='#3c353b', font=text_font))
+        label_mini_list[label_id].place(x=1100, y=50)
+        label_id += 1
+
+        text_font = font.Font(size=11)
+
+        label_mini_list.append(
+            tk.Label(main_frame, text='# piese\neliminate', fg='white', bg='#655f6a', font=text_font))
+        label_mini_list[label_id].place(x=5, y=300)
+        label_id += 1
+
+        label_mini_list.append(tk.Label(main_frame, text='# piese\nscoase', fg='white', bg='#655f6a', font=text_font))
+        label_mini_list[label_id].place(x=10, y=500)
+        label_id += 1
+
+        label_mini_list.append(
+            tk.Label(main_frame, text='# piese\neliminate', fg='white', bg='#3c353b', font=text_font))
+        label_mini_list[label_id].place(x=1125, y=300)
+        label_id += 1
+
+        label_mini_list.append(tk.Label(main_frame, text='# piese\nscoase', fg='white', bg='#3c353b', font=text_font))
+        label_mini_list[label_id].place(x=1125, y=500)
+        label_id += 1
+
+        global image1
+        image1 = tk.PhotoImage(file=color[0])
+        label_mini_list.append(tk.Label(main_frame, image=image1, bg=None))
+        label_mini_list[label_id].place(x=25, y=700)
+        label_id += 1
+
+        global image2
+        image2 = tk.PhotoImage(file=color[1])
+        label_mini_list.append(tk.Label(main_frame, image=image2, bg=None))
+        label_mini_list[label_id].place(x=1110, y=700)
+        label_id += 1
+
+        return label_mini_list
+
+    def show_player_stats(self, main_frame, player_stats):
+        stats_label_list: List[tk.Label] = []
+        stats_label_id = 0
+
+        n = len(stats_label_list)
+        if n > 0:
+            for index in range(0, n + 1):
+                stats_label_list[index].destroy()
+
+        text_font = font.Font(size=14)
+
+        # pentru player 1:
+
+        stats_label_list.append(tk.Label(main_frame, text=player_stats[0][0], fg='white', bg='#655f6a',
+                                         font=text_font))
+        stats_label_list[stats_label_id].place(x=30, y=250)
+        stats_label_id += 1
+
+        stats_label_list.append(tk.Label(main_frame, text=player_stats[0][1], fg='white', bg='#655f6a',
+                                         font=text_font))
+        stats_label_list[stats_label_id].place(x=30, y=450)
+        stats_label_id += 1
+
+        # pentru player 2:
+
+        stats_label_list.append(tk.Label(main_frame, text=player_stats[1][0], fg='white', bg='#3c353b',
+                                         font=text_font))
+        stats_label_list[stats_label_id].place(x=1150, y=250)
+        stats_label_id += 1
+
+        stats_label_list.append(tk.Label(main_frame, text=player_stats[1][1], fg='white', bg='#3c353b',
+                                         font=text_font))
+        stats_label_list[stats_label_id].place(x=1150, y=450)
+        stats_label_id += 1
+
+    def color_choosing(self):
+        a = random.randint(1, 9)
+        b = random.randint(1, 9)
+        while b == a or (a == 1 and b == 2) or (a == 2 and b == 3) or (a == 2 and b == 1) or (a == 3 and b == 2):
+            b = random.randint(1, 9)
+
+        if a == 1:
+            path_a = "assets/blue.png"
+        elif a == 2:
+            path_a = "assets/light-blue.png"
+        elif a == 3:
+            path_a = "assets/grey.png"
+        elif a == 4:
+            path_a = "assets/black.png"
+        elif a == 5:
+            path_a = "assets/brown.png"
+        elif a == 6:
+            path_a = "assets/green.png"
+        elif a == 7:
+            path_a = "assets/purple.png"
+        elif a == 8:
+            path_a = "assets/red.png"
+        else:
+            path_a = "assets/white.png"
+
+        if b == 1:
+            path_b = "assets/blue.png"
+        elif b == 2:
+            path_b = "assets/light-blue.png"
+        elif b == 3:
+            path_b = "assets/grey.png"
+        elif b == 4:
+            path_b = "assets/black.png"
+        elif b == 5:
+            path_b = "assets/brown.png"
+        elif b == 6:
+            path_b = "assets/green.png"
+        elif b == 7:
+            path_b = "assets/purple.png"
+        elif b == 8:
+            path_b = "assets/red.png"
+        else:
+            path_b = "assets/white.png"
+
+        color_path = [path_a, path_b]
+        return color_path
+
+    def init_board_player(self, main_frame, piece, coord_a, coord_b, poz):
+        # de retinut !! maxim 350 pixeli dimensiunea pentru o coloana
+        board_player = []
+        # un element din board = o coloana pe tabla, o coloana are lista de elemente, coord x si coord y pentru primul element
+        # as fi putut sa fac o clasa pentru tabla si init_board() sa fie defapt constructorul, dar am vrut sa fie ceva mai unic =))
+        coloana = [[], 970, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 900, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 830, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 760, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 690, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 620, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 525, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 455, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 385, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 315, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 245, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 170, coord_a]
+        board_player.append(coloana)
+        coloana = [[], 170, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 245, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 315, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 385, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 455, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 525, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 620, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 690, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 760, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 830, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 900, coord_b]
+        board_player.append(coloana)
+        coloana = [[], 970, coord_b]
+        board_player.append(coloana)
+
+        index = 0
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
+        index += 1
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
+        index += 1
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
+        index += 1
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
+        index += 1
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
+
+        index = 0
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
+        index += 1
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
+        index += 1
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
+
+        index = 0
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+        index += 1
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+        index += 1
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+        index += 1
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+        index += 1
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+
+        index = 0
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, index)))
+        index += 1
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, index)))
+
+        for i in range(0, len(board_player)):  # nr de coloane
+            for j in range(0, len(board_player[i][0])):  # elementele din fiecare coloana
+                if i <= 11:
+                    board_player[i][0][j].place(x=board_player[i][1], y=(board_player[i][2] + poz[0] * j))
+                elif i > 11:
+                    board_player[i][0][j].place(x=board_player[i][1], y=(board_player[i][2] + poz[1] * j))
+
+    def init_board(self, main_frame, color):
+        global piece_1
+        piece_1 = tk.PhotoImage(file=color[0])
+        global piece_2
+        piece_2 = tk.PhotoImage(file=color[1])
+
+        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65])
+        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65])
+
+        board = [board_1, board_2]
+        return board
+
+    def update_board(self):
+        pass
+
+    # se face dupa fiecare piesa mutata
+    # update stats: delete old stats, place new ones
+    # update pieces: delete old pieces, place new ones
+
+    def move(self, x, y):
+        global turn
+        if turn == 0 and len(dice) > 0:
+            print("ye")
+            turn = 1
+        elif turn == 1 and len(dice) > 0:
+            print("yassss")
+            turn = 0
+        else:
+            messagebox.showerror("Backgammon!!", "You must roll the dice first")
+
+
+# END CLASS
+
 
 def who_won(player):
     if player.stats[0][1] == 15:
@@ -19,7 +290,7 @@ def who_won(player):
 
 
 def roll_dice(main_frame, dice_image):
-    dice = []
+    global dice
     zar1 = random.randrange(1, 7)
     zar2 = random.randrange(1, 7)
     if zar1 == zar2:
@@ -53,46 +324,33 @@ def roll_dice(main_frame, dice_image):
         dice_image[1].configure(image=image[zar2 - 1])
         dice_image[1].place(x=830, y=380)
 
-    return dice
 
-
-def play(window, main_frame, player, roll_button, turn):
-    win = 0
-    if turn == 0:
-        # joc
-        player.stats[1][1] += 1
-        print("aici")
-        win = who_won(player)
-        turn = 1
-    else:
-        # joc
-        win = who_won(player)
-        turn = 0
-
-
-    if win > 0:
-        show_winner(window, main_frame, win, player, roll_button)
-    else:
-        window.after(500, play(window, main_frame, player, roll_button, turn))
-        window.mainloop()
-
-
-
-
-def show_winner(window, main_frame, id, player, roll_button):
+def show_winner(window, id, player, roll_button):
     roll_button.config(state="disabled")
-
-    sleep(1)
-
+    sleep(2)
     if id == 1:
         text = player.name[0]
     else:
         text = player.name[1]
 
+    canvas = tk.Canvas(window, width=600, height=400, bg="#000000")
+    canvas.place(x=600, y=400, anchor=CENTER)
+
+    color_codes = ["#fb1239", "#aa40ff", "#f0851b", "#0033cc", "#ffa97e", "#FFE133", "#64FF33", "#FF0D0D", "#0DB7FF",
+                   "#FF2DB6"]
+    max_artificii = random.randrange(10, 15)
+    for i in range(0, max_artificii):
+        x = random.randrange(0, 600)
+        y = random.randrange(0, 400)
+        color = random.randrange(0, 9)
+        dim = random.randrange(75, 225)
+        canvas.create_oval(x, y, x + dim, y + dim, fill=color_codes[color])
+
+    canvas.create_oval(200, 100, 400, 300, fill=color_codes[color])
     text = text + " won!!"
     text_font = font.Font(size=20)
-    label_winner = tk.Label(main_frame, text=text, fg="#ffffff", bg="#000000", font=text_font)
-    label_winner.place(x=600, y=350, anchor="center")
+    label_winner = tk.Label(canvas, text=text, fg="#000000", bg=color_codes[color], font=text_font)
+    canvas.create_window(300, 200, window=label_winner)
 
     window.mainloop
 
@@ -106,17 +364,15 @@ def player_gui_init(window):
     label_background = tk.Label(main_frame, image=background)
     label_background.place(x=-3, y=-2)
 
+    global player
     player = Player(main_frame, "player 1", "player 2")
 
     dice_image = []
     text_font = font.Font(size=14)
-    roll_button = tk.Button(main_frame, text="Roll", font=text_font, command=lambda: roll_dice(main_frame, dice_image))
+    roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2, command=lambda: roll_dice(main_frame, dice_image))
     roll_button.place(x=360, y=380)
 
-    window.after(500, play(window, main_frame, player, roll_button, 0))
-
-    # label = tk.Label(main_frame, text="ahalkdaslkdljslfjlsaakd;s")
-    # label.place(x=120, y=120)
+    # window.after(500, play(window, main_frame, player, roll_button, 0))
 
     # TO DO: init game, start game
     # HOW TO INIT GAME: lista de playeri, fiecare player va avea o lista de imagini (piese)
