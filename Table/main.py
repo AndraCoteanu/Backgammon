@@ -10,6 +10,8 @@ from typing import List
 # 0 = jucator 1; 1 = jucator 2 / pc
 turn = 0
 dice = []
+piece_image = []
+list_btn_option = []
 global roll_button
 
 
@@ -70,6 +72,9 @@ class Player:
         label_mini_list.append(tk.Label(main_frame, image=image2, bg=None))
         label_mini_list[label_id].place(x=1110, y=700)
         label_id += 1
+
+        global piece_image
+        piece_image = [image1, image2]
 
         return label_mini_list
 
@@ -243,18 +248,13 @@ class Player:
         global piece_2
         piece_2 = tk.PhotoImage(file=color[1])
 
-        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65], jucator=0)
-        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65], jucator=1)
+        board_1 = self.init_board_player(main_frame, piece_image[0], 15, 730, [65, -65], jucator=0)
+        board_2 = self.init_board_player(main_frame, piece_image[1], 730, 15, [-65, 65], jucator=1)
 
         board = []
         board.append(board_1)
         board.append(board_2)
         return board
-
-    # def click(self, event):
-    #     x, y = event.x, event.y
-    #     self.clicked = [x, y]
-    #     print(self.clicked)
 
     def piece_next_place(self, jucator, x, y):
         next_pos = []
@@ -267,9 +267,9 @@ class Player:
                     else:
                         coord_y = 730
 
-                    coord = 23-column
-                    if coord >=0 and coord <=23:
-                        if len(self.board[1][coord][0]) < 2  and column >= 0:
+                    coord = 23 - column
+                    if coord >= 0 and coord <= 23:
+                        if len(self.board[1][coord][0]) < 2 and column >= 0:
                             next_pos.append([column, coord_y])
 
             else:
@@ -315,20 +315,73 @@ class Player:
 
         return next_pos
 
-    def ceva(self):
-        pass
+    def update_board(self, jucator, coloana_luat, coloana_pus):
+        self.board[jucator][coloana_luat][0][-1].destroy()
+        self.board[jucator][coloana_luat][0].pop()
+
+        poz = len(self.board[jucator][coloana_pus][0]) + 1
+        self.board[jucator][coloana_pus][0].append(tk.Button(self.main_frame, image=piece_image[jucator], command=lambda: self.move(jucator, coloana_pus, poz)))
+
+        if jucator == 0:
+            poz_id = [65, -65]
+        else:
+            poz_id = [-65, 65]
+
+        if coloana_pus <= 11:
+            self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
+                                                y=(self.board[jucator][coloana_pus][2] + poz_id[0] * (len(self.board[jucator][coloana_pus][0])-1)))
+        elif coloana_pus > 11:
+            self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
+                                                y=(self.board[jucator][coloana_pus][2] + poz_id[1] * (len(self.board[jucator][coloana_pus][0])-1)))
+
+
+    def move_piece(self, jucator, coloana, luat):
+        global list_btn_option
+        for btn in list_btn_option:
+            btn.destroy()
+        list_btn_option = []
+
+        self.update_board(jucator, luat, coloana)
+
+        val_zar = luat-coloana
+        print(val_zar)
+        dice.remove(val_zar)
+
+        global turn
+        if len(dice)==0:
+            if turn == 0:
+                turn =1
+            else:
+                turn =0
+            roll_button.config(state="normal")
+
+        # sterge piesa mutata
+        # sterge toate pisele de pe tabla
+        # pune iar piesele pe tabla
+        # sterge din dice ce zar a fost folosit
+        # ++ ce face daca scoate o piesa ?? update stats
 
     def options(self, jucator, x, y):
+        global list_btn_option
+        if len(list_btn_option) > 0:
+            messagebox.showinfo("Backgammon!!", "The piece selected previously will be deselected")
+            for btn in list_btn_option:
+                btn.destroy()
+            list_btn_option = []
+
         next_pos = self.piece_next_place(jucator, x, y)
         print("pozitiile:", next_pos)
-        list_btn_option = []
         for i in range(0, len(next_pos)):
             if next_pos[i][1] == 15:
-                list_btn_option.append(tk.Button(self.main_frame, text="^", command=lambda: self.ceva()))
+                list_btn_option.append(tk.Button(self.main_frame, text="^"))
                 list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
             else:
-                list_btn_option.append(tk.Button(self.main_frame, text="v", command=lambda: self.ceva()))
+                list_btn_option.append(tk.Button(self.main_frame, text="v"))
                 list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
+
+        for i in range(0, len(list_btn_option)):
+            list_btn_option[i].config(command=lambda: self.move_piece(jucator, next_pos[i][0], x))
+
 
 
     def move(self, jucator, x, y):
@@ -340,9 +393,7 @@ class Player:
             else:
                 # print(type(self.board[jucator][x][0][y]))
                 # self.board[jucator][x][0][y].destroy()
-                #
-                # self.options(jucator, x, y)
-                self.options(jucator,x,y)
+                self.options(jucator, x, y)
 
                 if len(dice) == 0:
                     roll_button.config(state="normal")
@@ -353,7 +404,7 @@ class Player:
             if jucator == 0:
                 messagebox.showerror("Backgammon!!", "Not your piece")
             else:
-                print("yassss")
+                self.options(jucator, x, y)
 
                 if len(dice) == 0:
                     roll_button.config(state="normal")
@@ -463,10 +514,7 @@ def player_gui_init(window):
                             command=lambda: roll_dice(main_frame, dice_image))
     roll_button.place(x=360, y=380)
 
-    # window.after(500, play(window, main_frame, player, roll_button, 0))
-
     # TO DO: init game, start game
-    # HOW TO INIT GAME: lista de playeri, fiecare player va avea o lista de imagini (piese)
     # HOW TO START GAME: 2 ture: player 1, player 2; while pana nu a castigat cnv; in while se afiseaza statusul, in functie de tura joaca jucatorul x, dupa mutare se reinitializeaza statusurile
 
 
