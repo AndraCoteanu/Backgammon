@@ -10,10 +10,14 @@ from typing import List
 # 0 = jucator 1; 1 = jucator 2 / pc
 turn = 0
 dice = []
+global roll_button
 
 
 class Player:
-    def __init__(self, main_frame, jucator1, jucator2) -> None:
+    def __init__(self, window, main_frame, jucator1, jucator2) -> None:
+        self.clicked = []
+        self.window = window
+        self.main_frame = main_frame
         self.name = [jucator1, jucator2]
         self.stats = [[0, 0], [0, 0]]
         self.color = self.color_choosing()
@@ -205,7 +209,6 @@ class Player:
         coloana = [[], 970, coord_b]
         board_player.append(coloana)
 
-
         board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 0)))
         board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 1)))
         board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 2)))
@@ -240,38 +243,123 @@ class Player:
         global piece_2
         piece_2 = tk.PhotoImage(file=color[1])
 
-        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65], jucator = 0)
-        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65], jucator = 1)
+        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65], jucator=0)
+        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65], jucator=1)
 
         board = []
         board.append(board_1)
         board.append(board_2)
         return board
 
-    def update_board(self):
+    # def click(self, event):
+    #     x, y = event.x, event.y
+    #     self.clicked = [x, y]
+    #     print(self.clicked)
+
+    def piece_next_place(self, jucator, x, y):
+        next_pos = []
+        if jucator == 0:
+            if len(dice) == 2:
+                for index in range(0, len(dice)):
+                    column = x - dice[index]
+                    if column < 12:
+                        coord_y = 15
+                    else:
+                        coord_y = 730
+
+                    coord = 23-column
+                    if coord >=0 and coord <=23:
+                        if len(self.board[1][coord][0]) < 2  and column >= 0:
+                            next_pos.append([column, coord_y])
+
+            else:
+                column = x - dice[0]
+                if column < 12:
+                    coord_y = 15
+                else:
+                    coord_y = 730
+
+                coord = 23 - column
+                if coord >= 0 and coord <= 23:
+                    if len(self.board[1][coord][0]) < 2 and column >= 0:
+                        next_pos.append([column, coord_y])
+
+        else:
+            if len(dice) == 2:
+                for index in range(0, len(dice)):
+                    column = x - dice[index]
+                    if column < 12:
+                        coord_y = 730
+                    else:
+                        coord_y = 15
+
+                    coord = 23 - column
+                    if coord >= 0 and coord <= 23:
+                        if len(self.board[0][coord][0]) < 2 and column >= 0:
+                            next_pos.append([column, coord_y])
+
+            else:
+                column = x - dice[0]
+                if column < 12:
+                    coord_y = 730
+                else:
+                    coord_y = 15
+
+                coord = 23 - column
+                if coord >= 0 and coord <= 23:
+                    if len(self.board[0][coord][0]) < 2 and column >= 0:
+                        next_pos.append([column, coord_y])
+
+        if len(next_pos) == 0:
+            messagebox.showerror("Backgammon!!", "You don't have where to move this piece")
+
+        return next_pos
+
+    def ceva(self):
         pass
 
-    # se face dupa fiecare piesa mutata
-    # update stats: delete old stats, place new ones
-    # update pieces: delete old pieces, place new ones
+    def options(self, jucator, x, y):
+        next_pos = self.piece_next_place(jucator, x, y)
+        print("pozitiile:", next_pos)
+        list_btn_option = []
+        for i in range(0, len(next_pos)):
+            if next_pos[i][1] == 15:
+                list_btn_option.append(tk.Button(self.main_frame, text="^", command=lambda: self.ceva()))
+                list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
+            else:
+                list_btn_option.append(tk.Button(self.main_frame, text="v", command=lambda: self.ceva()))
+                list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
+
 
     def move(self, jucator, x, y):
         global turn, dice
+
         if turn == 0 and len(dice) > 0:
             if jucator == 1:
                 messagebox.showerror("Backgammon!!", "Not your piece")
             else:
-                print(type(self.board[0][x][0][y]))
-                self.board[0][x][0][y].destroy()
-                dice = []
-                turn = 1
+                # print(type(self.board[jucator][x][0][y]))
+                # self.board[jucator][x][0][y].destroy()
+                #
+                # self.options(jucator, x, y)
+                self.options(jucator,x,y)
+
+                if len(dice) == 0:
+                    roll_button.config(state="normal")
+                    turn = 1
+                    dice = []
+
         elif turn == 1 and len(dice) > 0:
             if jucator == 0:
                 messagebox.showerror("Backgammon!!", "Not your piece")
             else:
                 print("yassss")
-                dice = []
-                turn = 0
+
+                if len(dice) == 0:
+                    roll_button.config(state="normal")
+                    turn = 0
+                    dice = []
+
         else:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
@@ -323,6 +411,8 @@ def roll_dice(main_frame, dice_image):
         dice_image[1].configure(image=image[zar2 - 1])
         dice_image[1].place(x=830, y=380)
 
+    roll_button.config(state="disabled")
+
 
 def show_winner(window, id, player, roll_button):
     roll_button.config(state="disabled")
@@ -364,11 +454,13 @@ def player_gui_init(window):
     label_background.place(x=-3, y=-2)
 
     global player
-    player = Player(main_frame, "player 1", "player 2")
+    player = Player(window, main_frame, "player 1", "player 2")
 
     dice_image = []
     text_font = font.Font(size=14)
-    roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2, command=lambda: roll_dice(main_frame, dice_image))
+    global roll_button
+    roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2,
+                            command=lambda: roll_dice(main_frame, dice_image))
     roll_button.place(x=360, y=380)
 
     # window.after(500, play(window, main_frame, player, roll_button, 0))
@@ -447,16 +539,12 @@ def create_window():
     window.iconphoto(False, icon)
 
     window.eval('tk::PlaceWindow . center')
-
     return window
 
 
 def main():
     window = create_window()
-
     main_menu(window)
-
-    # asta cred ca e inutil, da arata bn si aici
     window.mainloop()
 
 
