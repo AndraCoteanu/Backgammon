@@ -12,6 +12,7 @@ turn = 0
 dice = []
 piece_image = []
 list_btn_option = []
+stats_label_list = []
 global roll_button
 
 
@@ -79,13 +80,15 @@ class Player:
         return label_mini_list
 
     def show_player_stats(self, main_frame, player_stats):
-        stats_label_list: List[tk.Label] = []
+        global stats_label_list
         stats_label_id = 0
 
         n = len(stats_label_list)
         if n > 0:
-            for index in range(0, n + 1):
-                stats_label_list[index].destroy()
+            for label in stats_label_list:
+                label.destroy()
+            for index in range(0, len(stats_label_list)):
+                stats_label_list.pop()
 
         text_font = font.Font(size=14)
 
@@ -327,6 +330,24 @@ class Player:
         else:
             poz_id = [-65, 65]
 
+        print("debbug::", coloana_pus)
+        if jucator == 0:
+            coloana_oponent = 23 - coloana_pus
+            if coloana_oponent >= 0 and coloana_oponent<=23 and len(self.board[1][coloana_oponent][0]) == 1:
+                self.board[1][coloana_oponent][0][-1].destroy()
+                self.board[1][coloana_oponent][0].pop()
+                self.stats[1][0] += 1
+                print("eliminate::", self.stats[1][0])
+                self.show_player_stats(self.main_frame,self.stats)
+        else:
+            coloana_oponent = 23 - coloana_pus
+            if coloana_oponent >= 0 and coloana_oponent <= 23 and len(self.board[0][coloana_oponent][0]) == 1:
+                self.board[0][coloana_oponent][0][-1].destroy()
+                self.board[0][coloana_oponent][0].pop()
+                self.stats[0][0] += 1
+                print("eliminate::", self.stats[0][0])
+                self.show_player_stats(self.main_frame, self.stats)
+
         if coloana_pus <= 11:
             self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
                                                 y=(self.board[jucator][coloana_pus][2] + poz_id[0] * (len(self.board[jucator][coloana_pus][0])-1)))
@@ -336,6 +357,7 @@ class Player:
 
 
     def move_piece(self, jucator, coloana, luat):
+        print("am dat click pe:", coloana, luat)
         global list_btn_option
         for btn in list_btn_option:
             btn.destroy()
@@ -355,11 +377,6 @@ class Player:
                 turn =0
             roll_button.config(state="normal")
 
-        # sterge piesa mutata
-        # sterge toate pisele de pe tabla
-        # pune iar piesele pe tabla
-        # sterge din dice ce zar a fost folosit
-        # ++ ce face daca scoate o piesa ?? update stats
 
     def options(self, jucator, x, y):
         global list_btn_option
@@ -379,8 +396,13 @@ class Player:
                 list_btn_option.append(tk.Button(self.main_frame, text="v"))
                 list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
 
-        for i in range(0, len(list_btn_option)):
-            list_btn_option[i].config(command=lambda: self.move_piece(jucator, next_pos[i][0], x))
+        if len(list_btn_option) > 0:
+            list_btn_option[0].config(command=lambda: self.move_piece(jucator, next_pos[0][0], x))
+            if len(list_btn_option) == 2:
+                list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
+
+        # for i in range(0, len(list_btn_option)):
+        #     list_btn_option[i].config(command=lambda: self.move_piece(jucator, next_pos[i][0], x))
 
 
 
@@ -391,9 +413,10 @@ class Player:
             if jucator == 1:
                 messagebox.showerror("Backgammon!!", "Not your piece")
             else:
-                # print(type(self.board[jucator][x][0][y]))
-                # self.board[jucator][x][0][y].destroy()
-                self.options(jucator, x, y)
+                if self.stats[jucator][0] == 0:
+                    self.options(jucator, x, y)
+                else:
+                    pass
 
                 if len(dice) == 0:
                     roll_button.config(state="normal")
@@ -404,7 +427,10 @@ class Player:
             if jucator == 0:
                 messagebox.showerror("Backgammon!!", "Not your piece")
             else:
-                self.options(jucator, x, y)
+                if self.stats[jucator][0] == 0:
+                    self.options(jucator, x, y)
+                else:
+                    pass
 
                 if len(dice) == 0:
                     roll_button.config(state="normal")
