@@ -30,5 +30,27 @@ After more testing of the GUI I changed the dimmensions. After starting a game t
 ![image](https://user-images.githubusercontent.com/72747266/147503518-69ba33c4-cdeb-41f3-b4fc-5d399772eed8.png)
 
 
+Player vs Player flow:
+
+![image](https://user-images.githubusercontent.com/72747266/147604365-b6ca44a9-3362-498a-8ab0-06bbe3fa531c.png)
+
+![image](https://user-images.githubusercontent.com/72747266/147604416-1cc5aa83-de77-49ab-b6b1-7c381e6dc09b.png)
+
+![image](https://user-images.githubusercontent.com/72747266/147604454-669b9ce5-a390-43ae-a527-3cdd7b652822.png)
+
+![image](https://user-images.githubusercontent.com/72747266/147604492-2f3208bf-c664-472c-a707-fa13b9c6114c.png)
+
+
+
+Tipuri de avertizari pentru jucatori:
+
+![image](https://user-images.githubusercontent.com/72747266/147604446-c30ccf6f-ad79-4f97-893a-281cf19e26b9.png)
+
+![image](https://user-images.githubusercontent.com/72747266/147604466-ed0dd08a-6960-4d5b-a64c-3c935bc7c01a.png)
+
+![image](https://user-images.githubusercontent.com/72747266/147604570-92ed3662-913f-4575-9727-e279cd71a1c3.png)
+
+
+
 
 Disclaimer: all UI/UX used was found in a form or another on the internet and I altered and edited it based on my and the project needs.
