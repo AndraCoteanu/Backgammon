@@ -205,39 +205,25 @@ class Player:
         coloana = [[], 970, coord_b]
         board_player.append(coloana)
 
-        index = 0
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
-        index += 1
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
-        index += 1
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
-        index += 1
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
-        index += 1
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, index)))
 
-        index = 0
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
-        index += 1
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
-        index += 1
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, index)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 0)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 1)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 2)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 3)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 4)))
 
-        index = 0
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
-        index += 1
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
-        index += 1
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
-        index += 1
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
-        index += 1
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, index)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 0)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 1)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 2)))
 
-        index = 0
-        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, index)))
-        index += 1
-        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, index)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 0)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 1)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 2)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 3)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 4)))
+
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, 0)))
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, 1)))
 
         for i in range(0, len(board_player)):  # nr de coloane
             for j in range(0, len(board_player[i][0])):  # elementele din fiecare coloana
@@ -245,6 +231,8 @@ class Player:
                     board_player[i][0][j].place(x=board_player[i][1], y=(board_player[i][2] + poz[0] * j))
                 elif i > 11:
                     board_player[i][0][j].place(x=board_player[i][1], y=(board_player[i][2] + poz[1] * j))
+
+        return board_player
 
     def init_board(self, main_frame, color):
         global piece_1
@@ -255,7 +243,9 @@ class Player:
         board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65])
         board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65])
 
-        board = [board_1, board_2]
+        board = []
+        board.append(board_1)
+        board.append(board_2)
         return board
 
     def update_board(self):
@@ -268,7 +258,9 @@ class Player:
     def move(self, x, y):
         global turn
         if turn == 0 and len(dice) > 0:
-            print("ye")
+            # self.board[0][x][0][y].place_forget()
+            print(type(self.board[0][x][0][y]))
+            self.board[0][x][0][y].destroy()
             turn = 1
         elif turn == 1 and len(dice) > 0:
             print("yassss")
