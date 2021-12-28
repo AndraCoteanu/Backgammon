@@ -151,7 +151,7 @@ class Player:
         color_path = [path_a, path_b]
         return color_path
 
-    def init_board_player(self, main_frame, piece, coord_a, coord_b, poz):
+    def init_board_player(self, main_frame, piece, coord_a, coord_b, poz, jucator):
         # de retinut !! maxim 350 pixeli dimensiunea pentru o coloana
         board_player = []
         # un element din board = o coloana pe tabla, o coloana are lista de elemente, coord x si coord y pentru primul element
@@ -206,24 +206,24 @@ class Player:
         board_player.append(coloana)
 
 
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 0)))
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 1)))
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 2)))
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 3)))
-        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(5, 4)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 0)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 1)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 2)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 3)))
+        board_player[5][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 5, 4)))
 
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 0)))
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 1)))
-        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(7, 2)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 7, 0)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 7, 1)))
+        board_player[7][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 7, 2)))
 
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 0)))
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 1)))
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 2)))
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 3)))
-        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(12, 4)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 12, 0)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 12, 1)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 12, 2)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 12, 3)))
+        board_player[12][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 12, 4)))
 
-        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, 0)))
-        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(23, 1)))
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 23, 0)))
+        board_player[23][0].append(tk.Button(main_frame, image=piece, command=lambda: self.move(jucator, 23, 1)))
 
         for i in range(0, len(board_player)):  # nr de coloane
             for j in range(0, len(board_player[i][0])):  # elementele din fiecare coloana
@@ -240,8 +240,8 @@ class Player:
         global piece_2
         piece_2 = tk.PhotoImage(file=color[1])
 
-        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65])
-        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65])
+        board_1 = self.init_board_player(main_frame, piece_1, 15, 730, [65, -65], jucator = 0)
+        board_2 = self.init_board_player(main_frame, piece_2, 730, 15, [-65, 65], jucator = 1)
 
         board = []
         board.append(board_1)
@@ -255,16 +255,23 @@ class Player:
     # update stats: delete old stats, place new ones
     # update pieces: delete old pieces, place new ones
 
-    def move(self, x, y):
-        global turn
+    def move(self, jucator, x, y):
+        global turn, dice
         if turn == 0 and len(dice) > 0:
-            # self.board[0][x][0][y].place_forget()
-            print(type(self.board[0][x][0][y]))
-            self.board[0][x][0][y].destroy()
-            turn = 1
+            if jucator == 1:
+                messagebox.showerror("Backgammon!!", "Not your piece")
+            else:
+                print(type(self.board[0][x][0][y]))
+                self.board[0][x][0][y].destroy()
+                dice = []
+                turn = 1
         elif turn == 1 and len(dice) > 0:
-            print("yassss")
-            turn = 0
+            if jucator == 0:
+                messagebox.showerror("Backgammon!!", "Not your piece")
+            else:
+                print("yassss")
+                dice = []
+                turn = 0
         else:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
