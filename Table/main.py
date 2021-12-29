@@ -39,7 +39,10 @@ class Player:
         label_id += 1
 
         label_mini_list.append(tk.Label(main_frame, text=player[1], fg='white', bg='#3c353b', font=text_font))
-        label_mini_list[label_id].place(x=1100, y=50)
+        if player[1]=="player 2":
+            label_mini_list[label_id].place(x=1100, y=50)
+        else:
+            label_mini_list[label_id].place(x=1130, y=50)
         label_id += 1
 
         text_font = font.Font(size=11)
@@ -259,6 +262,153 @@ class Player:
         board.append(board_2)
         return board
 
+    def exist_move(self, jucator):
+        count = 0
+        if self.all_in_house(jucator) == False:
+            if len(dice) > 0:
+                for index in range(0, len(self.board[jucator])):
+                    pos = self.piece_next_place(jucator, index, 0)
+                    if len(pos) > 0:
+                        count += 1
+        else:
+            if len(dice) > 0:
+                for index in range(0, len(self.board[jucator])):
+                    pos = self.end_piece_life(jucator, index, 0)
+                    if len(pos) > 0:
+                        count += 1
+
+        if count == 0:
+            return False
+        else:
+            return True
+
+    def all_in_house(self, jucator):
+        count = 0
+        if self.stats[jucator][0] == 0:
+            for column in range(6, 24):
+                count += len(self.board[jucator][column][0])
+        if count == 0:
+            return True
+        else:
+            return False
+
+    def end_piece_life(self, jucator, x, y):
+        next_pos = []
+        if jucator == 0:
+            if len(dice) == 2:
+                for index in range(0, len(dice)):
+                    column = x - dice[index]
+                    if column < 12:
+                        coord_y = 15
+                    else:
+                        coord_y = 730
+
+                    coord = 23 - column
+                    if coord >= 0 and coord <= 23:
+                        if len(self.board[1][coord][0]) < 2 and column >= 0:
+                            next_pos.append([column, coord_y])
+                    elif column < 0:
+                        verif_last_column = 1
+                        if column == -1:
+                            next_pos.append([-5, 0])
+                        else:
+                            for i in range(0, 6):
+                                if len(self.board[jucator][i][0]) > 0:
+                                    dist = i - dice[index]
+                                    if dist < 0 and dist > column:
+                                        verif_last_column = 0
+                                    elif dist >= 0:
+                                        verif_last_column = 0
+
+                            if verif_last_column == 1:
+                                next_pos.append([-5, 0])
+            else:
+                column = x - dice[0]
+                if column < 12:
+                    coord_y = 15
+                else:
+                    coord_y = 730
+
+                coord = 23 - column
+                if coord >= 0 and coord <= 23:
+                    if len(self.board[1][coord][0]) < 2 and column >= 0:
+                        next_pos.append([column, coord_y])
+                elif column < 0:
+                    verif_last_column = 1
+                    if column == -1:
+                        next_pos.append([-5, 0])
+                    else:
+                        for i in range(0, 6):
+                            if len(self.board[jucator][i][0]) > 0:
+                                dist = i - dice[0]
+                                if dist < 0 and dist > column:
+                                    verif_last_column = 0
+                                elif dist >= 0:
+                                    verif_last_column = 0
+
+                        if verif_last_column == 1:
+                            next_pos.append([-5, 0])
+        else:
+            if len(dice) == 2:
+                for index in range(0, len(dice)):
+                    column = x - dice[index]
+                    if column < 12:
+                        coord_y = 730
+                    else:
+                        coord_y = 15
+
+                    coord = 23 - column
+                    if coord >= 0 and coord <= 23:
+                        if len(self.board[0][coord][0]) < 2 and column >= 0:
+                            next_pos.append([column, coord_y])
+                    elif column < 0:
+                        verif_last_column = 1
+                        if column == -1:
+                            next_pos.append([-5, 0])
+                        else:
+                            for i in range(0, 6):
+                                if len(self.board[jucator][i][0]) > 0:
+                                    dist = i - dice[index]
+                                    if dist < 0 and dist > column:
+                                        verif_last_column = 0
+                                    elif dist >= 0:
+                                        verif_last_column = 0
+
+                            if verif_last_column == 1:
+                                next_pos.append([-5, 0])
+
+            else:
+                column = x - dice[0]
+                if column < 12:
+                    coord_y = 730
+                else:
+                    coord_y = 15
+
+                coord = 23 - column
+                if coord >= 0 and coord <= 23:
+                    if len(self.board[0][coord][0]) < 2 and column >= 0:
+                        next_pos.append([column, coord_y])
+                elif column < 0:
+                    verif_last_column = 1
+                    if column == -1:
+                        next_pos.append([-5, 0])
+                    else:
+                        for i in range(0, 6):
+                            if len(self.board[jucator][i][0]) > 0:
+                                dist = i - dice[0]
+                                if dist < 0 and dist > column:
+                                    verif_last_column = 0
+                                elif dist >= 0:
+                                    verif_last_column = 0
+
+                        if verif_last_column == 1:
+                            next_pos.append([-5, 0])
+
+        if len(next_pos) == 0 and y > 0:
+            messagebox.showerror("Backgammon!!", "You don't have where to move this piece")
+
+        return next_pos
+
     def piece_next_place(self, jucator, x, y):
         next_pos = []
         if jucator == 0:
@@ -313,48 +463,60 @@ class Player:
                     if len(self.board[0][coord][0]) < 2 and column >= 0:
                         next_pos.append([column, coord_y])
 
-        if len(next_pos) == 0:
+        if len(next_pos) == 0 and y > 0:
             messagebox.showerror("Backgammon!!", "You don't have where to move this piece")
 
         return next_pos
 
     def update_board(self, jucator, coloana_luat, coloana_pus):
-        self.board[jucator][coloana_luat][0][-1].destroy()
-        self.board[jucator][coloana_luat][0].pop()
-
-        poz = len(self.board[jucator][coloana_pus][0]) + 1
-        self.board[jucator][coloana_pus][0].append(tk.Button(self.main_frame, image=piece_image[jucator], command=lambda: self.move(jucator, coloana_pus, poz)))
-
-        if jucator == 0:
-            poz_id = [65, -65]
-        else:
+        if jucator == 1:
+            oponent = 0
             poz_id = [-65, 65]
-
-        print("debbug::", coloana_pus)
-        if jucator == 0:
-            coloana_oponent = 23 - coloana_pus
-            if coloana_oponent >= 0 and coloana_oponent<=23 and len(self.board[1][coloana_oponent][0]) == 1:
-                self.board[1][coloana_oponent][0][-1].destroy()
-                self.board[1][coloana_oponent][0].pop()
-                self.stats[1][0] += 1
-                print("eliminate::", self.stats[1][0])
-                self.show_player_stats(self.main_frame,self.stats)
         else:
+            oponent = 1
+            poz_id = [65, -65]
+
+        if coloana_luat != -5:
+            self.board[jucator][coloana_luat][0][-1].destroy()
+            self.board[jucator][coloana_luat][0].pop()
+
+            poz = len(self.board[jucator][coloana_pus][0]) + 1
+            self.board[jucator][coloana_pus][0].append(tk.Button(self.main_frame, image=piece_image[jucator],
+                                                                 command=lambda: self.move(jucator, coloana_pus, poz)))
+
+            if coloana_pus <= 11:
+                self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
+                                                              y=(self.board[jucator][coloana_pus][2] + poz_id[0] * (
+                                                                      len(self.board[jucator][coloana_pus][0]) - 1)))
+            elif coloana_pus > 11:
+                self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
+                                                              y=(self.board[jucator][coloana_pus][2] + poz_id[1] * (
+                                                                      len(self.board[jucator][coloana_pus][0]) - 1)))
+
             coloana_oponent = 23 - coloana_pus
-            if coloana_oponent >= 0 and coloana_oponent <= 23 and len(self.board[0][coloana_oponent][0]) == 1:
-                self.board[0][coloana_oponent][0][-1].destroy()
-                self.board[0][coloana_oponent][0].pop()
-                self.stats[0][0] += 1
-                print("eliminate::", self.stats[0][0])
-                self.show_player_stats(self.main_frame, self.stats)
 
-        if coloana_pus <= 11:
-            self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
-                                                y=(self.board[jucator][coloana_pus][2] + poz_id[0] * (len(self.board[jucator][coloana_pus][0])-1)))
-        elif coloana_pus > 11:
-            self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
-                                                y=(self.board[jucator][coloana_pus][2] + poz_id[1] * (len(self.board[jucator][coloana_pus][0])-1)))
+        else:
 
+            poz = len(self.board[jucator][23 - coloana_pus][0]) + 1
+            self.board[jucator][23 - coloana_pus][0].append(tk.Button(self.main_frame, image=piece_image[jucator],
+                                                                      command=lambda: self.move(jucator,
+                                                                                                23 - coloana_pus, poz)))
+
+            if coloana_pus <= 11:
+                self.board[jucator][23 - coloana_pus][0][-1].place(x=self.board[jucator][23 - coloana_pus][1],
+                                                                   y=(self.board[jucator][23 - coloana_pus][2] + poz_id[
+                                                                       0] * (-1) * (
+                                                                              len(self.board[jucator][23 - coloana_pus][
+                                                                                      0]) - 1)))
+
+            coloana_oponent = coloana_pus
+
+        if coloana_oponent >= 0 and coloana_oponent <= 23 and len(self.board[oponent][coloana_oponent][0]) == 1:
+            self.board[oponent][coloana_oponent][0][-1].destroy()
+            self.board[oponent][coloana_oponent][0].pop()
+            self.stats[oponent][0] += 1
+            print("eliminate::", self.stats[oponent][0])
+            self.show_player_stats(self.main_frame, self.stats)
 
     def move_piece(self, jucator, coloana, luat):
         print("am dat click pe:", coloana, luat)
@@ -365,18 +527,26 @@ class Player:
 
         self.update_board(jucator, luat, coloana)
 
-        val_zar = luat-coloana
-        print(val_zar)
-        dice.remove(val_zar)
+        if luat != -5:
+            val_zar = luat - coloana
+            print(val_zar)
+            dice.remove(val_zar)
+        else:
+            val_zar = coloana + 1
+            print(val_zar)
+            dice.remove(val_zar)
+            self.stats[jucator][0] -= 1
+            self.show_player_stats(self.main_frame, self.stats)
+            if self.stats[jucator][0] > 0 and len(dice) > 0:
+                self.revive(jucator)
 
         global turn
-        if len(dice)==0:
+        if len(dice) == 0:
             if turn == 0:
-                turn =1
+                turn = 1
             else:
-                turn =0
+                turn = 0
             roll_button.config(state="normal")
-
 
     def options(self, jucator, x, y):
         global list_btn_option
@@ -386,25 +556,130 @@ class Player:
                 btn.destroy()
             list_btn_option = []
 
-        next_pos = self.piece_next_place(jucator, x, y)
-        print("pozitiile:", next_pos)
-        for i in range(0, len(next_pos)):
-            if next_pos[i][1] == 15:
-                list_btn_option.append(tk.Button(self.main_frame, text="^"))
-                list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
+        if self.all_in_house(jucator) == False:
+            next_pos = self.piece_next_place(jucator, x, y)
+            for i in range(0, len(next_pos)):
+                if next_pos[i][1] == 15:
+                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
+                else:
+                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
+
+            if len(list_btn_option) > 0:
+                list_btn_option[0].config(command=lambda: self.move_piece(jucator, next_pos[0][0], x))
+                if len(list_btn_option) == 2:
+                    list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
+        else:
+            next_pos = self.end_piece_life(jucator, x, y)
+            for i in range(0, len(next_pos)):
+                if next_pos[i][1] == 15:
+                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
+                elif next_pos[i][1] == 730:
+                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
+                else:
+                    list_btn_option.append(tk.Button(self.main_frame, text="Scoate"))
+                    if jucator == 0:
+                        list_btn_option[i].place(x=12, y=560)
+                    else:
+                        list_btn_option[i].place(x=1133, y=560)
+
+            if len(list_btn_option) > 0:
+                if list_btn_option[0]["text"] == "Scoate":
+                    list_btn_option[0].config(command=lambda: self.remove_piece(jucator, x))
+                else:
+                    list_btn_option[0].config(command=lambda: self.move_piece(jucator, next_pos[0][0], x))
+
+                if len(list_btn_option) == 2:
+                    if list_btn_option[1]["text"] == "Scoate":
+                        list_btn_option[1].config(command=lambda: self.remove_piece(jucator, x))
+                    else:
+                        list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
+
+    def remove_piece(self, jucator, coloana):
+        self.board[jucator][coloana][0][-1].destroy()
+        self.board[jucator][coloana][0].pop()
+        self.stats[jucator][1] += 1
+
+        verif_scos = 0
+        for index in range(0, len(dice)):
+            if coloana + 1 == dice[index]:
+                print("AICI", coloana)
+                dice.remove(coloana + 1)
+                verif_scos = 1
+                break;
+
+        if verif_scos == 0:
+            print("atunci, aici", coloana)
+            okay = 0
+            for i in range(1, 6):
+                if okay == 0:
+                    for index in range(0, len(dice)):
+                        if i + coloana == dice[index]:
+                            dice.remove(dice[index])
+                            okay = 1
+                            break
+
+        global list_btn_option, roll_button
+        for index in list_btn_option:
+            index.destroy()
+        for index in range(0, len(list_btn_option)):
+            list_btn_option.pop()
+
+        self.show_player_stats(self.main_frame, self.stats)
+
+        winner = who_won(self)
+        if winner > 0:
+            show_winner(self.window, winner, self, roll_button)
+
+        if len(dice) == 0:
+            global turn
+            roll_button.config(state="normal")
+            if jucator == 0:
+                turn = 1
             else:
-                list_btn_option.append(tk.Button(self.main_frame, text="v"))
-                list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
+                turn = 0
 
-        if len(list_btn_option) > 0:
-            list_btn_option[0].config(command=lambda: self.move_piece(jucator, next_pos[0][0], x))
-            if len(list_btn_option) == 2:
-                list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
+    def revive(self, jucator):
+        if jucator == 1:
+            other_player = 0
+            coord_y = 15
+        else:
+            other_player = 1
+            coord_y = 730
 
-        # for i in range(0, len(list_btn_option)):
-        #     list_btn_option[i].config(command=lambda: self.move_piece(jucator, next_pos[i][0], x))
+        posible_position = []
+        global dice, turn
 
+        if len(dice) == 2:
+            for zar in dice:
+                if len(self.board[other_player][zar - 1][0]) < 2:
+                    posible_position.append([zar - 1, coord_y])
+        else:
+            if len(self.board[other_player][dice[0] - 1][0]) < 2:
+                posible_position.append([dice[0] - 1, coord_y])
 
+        if len(posible_position) == 0:
+            # turn = other_player
+            roll_button.config(state="normal")
+            dice = []
+        else:
+            global list_btn_option
+
+            for i in range(0, len(posible_position)):
+                if posible_position[i][1] == 15:
+                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][posible_position[i][0]][1]), y=350)
+                else:
+                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option[i].place(x=(17 + self.board[jucator][posible_position[i][0]][1]), y=430)
+
+            if len(list_btn_option) > 0:
+                list_btn_option[0].config(command=lambda: self.move_piece(jucator, posible_position[0][0], -5))
+                if len(list_btn_option) == 2:
+                    list_btn_option[1].config(command=lambda: self.move_piece(jucator, posible_position[1][0], -5))
 
     def move(self, jucator, x, y):
         global turn, dice
@@ -416,9 +691,10 @@ class Player:
                 if self.stats[jucator][0] == 0:
                     self.options(jucator, x, y)
                 else:
-                    pass
+                    messagebox.showinfo("Backgammon!!",
+                                        "You can't move pieces.\nYou have to get the eliminated ones on the board first.")
 
-                if len(dice) == 0:
+                if len(dice) == 0 or self.exist_move(jucator) == False:
                     roll_button.config(state="normal")
                     turn = 1
                     dice = []
@@ -430,9 +706,10 @@ class Player:
                 if self.stats[jucator][0] == 0:
                     self.options(jucator, x, y)
                 else:
-                    pass
+                    messagebox.showinfo("Backgammon!!",
+                                        "You can't move pieces.\nYou have to get the eliminated ones on the board first.")
 
-                if len(dice) == 0:
+                if len(dice) == 0 or self.exist_move(jucator) == False:
                     roll_button.config(state="normal")
                     turn = 0
                     dice = []
@@ -453,7 +730,7 @@ def who_won(player):
         return 0
 
 
-def roll_dice(main_frame, dice_image):
+def roll_dice(main_frame, dice_image, player):
     global dice
     zar1 = random.randrange(1, 7)
     zar2 = random.randrange(1, 7)
@@ -466,7 +743,7 @@ def roll_dice(main_frame, dice_image):
         dice.append(zar1)
         dice.append(zar2)
 
-    global image
+    global image, turn
     img1 = tk.PhotoImage(file="assets/dice1.png")
     img2 = tk.PhotoImage(file="assets/dice2.png")
     img3 = tk.PhotoImage(file="assets/dice3.png")
@@ -489,6 +766,13 @@ def roll_dice(main_frame, dice_image):
         dice_image[1].place(x=830, y=380)
 
     roll_button.config(state="disabled")
+    if player.stats[turn][0] > 0:
+        player.revive(turn)
+        if len(dice) == 0:
+            if turn == 0:
+                turn = 1
+            else:
+                turn = 0
 
 
 def show_winner(window, id, player, roll_button):
@@ -537,15 +821,31 @@ def player_gui_init(window):
     text_font = font.Font(size=14)
     global roll_button
     roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2,
-                            command=lambda: roll_dice(main_frame, dice_image))
+                            command=lambda: roll_dice(main_frame, dice_image, player))
     roll_button.place(x=360, y=380)
 
     # TO DO: init game, start game
     # HOW TO START GAME: 2 ture: player 1, player 2; while pana nu a castigat cnv; in while se afiseaza statusul, in functie de tura joaca jucatorul x, dupa mutare se reinitializeaza statusurile
 
 
-# TO DO: def pc_gui_init(window):
+def pc_gui_init(window):
+    main_frame = tk.Frame(window, width=1200, height=800)
+    main_frame.pack(side="top", expand=False, fill="both")
 
+    global background
+    background = tk.PhotoImage(file="assets/board2.png")
+    label_background = tk.Label(main_frame, image=background)
+    label_background.place(x=-3, y=-2)
+
+    global player
+    player = Player(window, main_frame, "player 1", "PC")
+
+    dice_image = []
+    text_font = font.Font(size=14)
+    global roll_button
+    roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2,
+                            command=lambda: roll_dice(main_frame, dice_image, player))
+    roll_button.place(x=360, y=380)
 
 def main_menu(window):
     main_frame = tk.Frame(window, width=1200, height=800)
@@ -587,7 +887,7 @@ def main_menu(window):
         window = create_window()
 
         # TO DO: initializeaza jocul
-        player_gui_init(window)
+        pc_gui_init(window)
 
     # buton pentru jocul dintre jucator si pc
     button_list.append(tk.Button(main_frame, text="Player vs PC", bg="#c2fcdd", fg="#002e1d", font=text_font,
