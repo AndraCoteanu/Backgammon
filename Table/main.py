@@ -544,6 +544,8 @@ class Player:
         if len(dice) == 0:
             if turn == 0:
                 turn = 1
+                if turn == 1 and self.name[1] == "PC":
+                    self.pc_play()
             else:
                 turn = 0
             roll_button.config(state="normal")
@@ -639,6 +641,8 @@ class Player:
             roll_button.config(state="normal")
             if jucator == 0:
                 turn = 1
+                if turn == 1 and self.name[1] == "PC":
+                    self.pc_play()
             else:
                 turn = 0
 
@@ -697,6 +701,8 @@ class Player:
                 if len(dice) == 0 or self.exist_move(jucator) == False:
                     roll_button.config(state="normal")
                     turn = 1
+                    if turn == 1 and self.name[1]=="PC":
+                        self.pc_play()
                     dice = []
 
         elif turn == 1 and len(dice) > 0:
@@ -717,6 +723,10 @@ class Player:
         else:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
+    def pc_play(self):
+        print("yeye")
+        global turn
+        turn = 0
 
 # END CLASS
 
@@ -771,6 +781,8 @@ def roll_dice(main_frame, dice_image, player):
         if len(dice) == 0:
             if turn == 0:
                 turn = 1
+                if turn == 1 and player.name[1] == "PC":
+                    player.pc_play()
             else:
                 turn = 0
 
