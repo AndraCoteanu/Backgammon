@@ -262,16 +262,52 @@ class Player:
         board.append(board_2)
         return board
 
+    def replace_piece(self, coloana, id_coloana, type):
+        global turn
+        if type == 0:
+            if turn == 1:
+                poz_id = [-1, 1]
+            else:
+                poz_id = [1, -1]
+
+            dist = 350 / len(coloana[0])
+
+            poz_id[0] *= dist
+            poz_id[1] *= dist
+
+            print("REARANJEZ")
+
+            for index in range(0, len(coloana[0])):
+                if id_coloana <= 11:
+                    coloana[0][index].place(x=coloana[1], y = (coloana[2] + poz_id[0] * index))
+                elif id_coloana > 11:
+                    coloana[0][index].place(x = coloana[1], y = (coloana[2]+poz_id[1]*index))
+        elif type == 1:
+            if turn == 1:
+                poz_id = [-65, 65]
+            else:
+                poz_id = [65, -65]
+            print("REARANJEZ")
+
+            for index in range(0, len(coloana[0])):
+                if id_coloana <= 11:
+                    coloana[0][index].place(x=coloana[1], y=(coloana[2] + poz_id[0] * index))
+                elif id_coloana > 11:
+                    coloana[0][index].place(x=coloana[1], y=(coloana[2] + poz_id[1] * index))
+
+
     def exist_move(self, jucator):
         count = 0
         if self.all_in_house(jucator) == False:
             if len(dice) > 0:
+                count = 0
                 for index in range(0, len(self.board[jucator])):
                     pos = self.piece_next_place(jucator, index, 0)
                     if len(pos) > 0:
                         count += 1
         else:
             if len(dice) > 0:
+                count = 0
                 for index in range(0, len(self.board[jucator])):
                     pos = self.end_piece_life(jucator, index, 0)
                     if len(pos) > 0:
@@ -479,6 +515,11 @@ class Player:
         if coloana_luat != -5:
             self.board[jucator][coloana_luat][0][-1].destroy()
             self.board[jucator][coloana_luat][0].pop()
+            if len(self.board[jucator][coloana_luat][0]) > 5:
+                self.replace_piece(self.board[jucator][coloana_luat], coloana_luat, 0)
+            else:
+                self.replace_piece(self.board[jucator][coloana_luat], coloana_luat, 1)
+
 
             poz = len(self.board[jucator][coloana_pus][0]) + 1
             self.board[jucator][coloana_pus][0].append(tk.Button(self.main_frame, image=piece_image[jucator],
@@ -488,10 +529,18 @@ class Player:
                 self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
                                                               y=(self.board[jucator][coloana_pus][2] + poz_id[0] * (
                                                                       len(self.board[jucator][coloana_pus][0]) - 1)))
+                if len(self.board[jucator][coloana_pus][0]) > 5:
+                    self.replace_piece(self.board[jucator][coloana_pus], coloana_pus, 0)
+                else:
+                    self.replace_piece(self.board[jucator][coloana_pus], coloana_pus, 1)
             elif coloana_pus > 11:
                 self.board[jucator][coloana_pus][0][-1].place(x=self.board[jucator][coloana_pus][1],
                                                               y=(self.board[jucator][coloana_pus][2] + poz_id[1] * (
                                                                       len(self.board[jucator][coloana_pus][0]) - 1)))
+                if len(self.board[jucator][coloana_pus][0]) > 5:
+                    self.replace_piece(self.board[jucator][coloana_pus], coloana_pus, 0)
+                else:
+                    self.replace_piece(self.board[jucator][coloana_pus], coloana_pus, 1)
 
             coloana_oponent = 23 - coloana_pus
 
@@ -508,6 +557,10 @@ class Player:
                                                                        0] * (-1) * (
                                                                               len(self.board[jucator][23 - coloana_pus][
                                                                                       0]) - 1)))
+                if len(self.board[jucator][23 - coloana_pus][0]) > 5:
+                    self.replace_piece(self.board[jucator][23 - coloana_pus], 23 - coloana_pus, 0)
+                else:
+                    self.replace_piece(self.board[jucator][23 - coloana_pus], 23 - coloana_pus, 1)
 
             coloana_oponent = coloana_pus
 
@@ -666,7 +719,6 @@ class Player:
                 posible_position.append([dice[0] - 1, coord_y])
 
         if len(posible_position) == 0:
-            # turn = other_player
             roll_button.config(state="normal")
             dice = []
         else:
@@ -724,7 +776,7 @@ class Player:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
     def pc_play(self):
-        print("yeye")
+        print("SUNT PC")
         global turn
         turn = 0
 
@@ -785,6 +837,9 @@ def roll_dice(main_frame, dice_image, player):
                     player.pc_play()
             else:
                 turn = 0
+
+    if player.exist_move(turn) == False:
+        roll_button.config(state="normal")
 
 
 def show_winner(window, id, player, roll_button):
