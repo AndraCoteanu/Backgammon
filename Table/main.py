@@ -1,7 +1,7 @@
 import random
+import time
 import webbrowser
 import tkinter as tk
-from time import sleep
 from tkinter import font, CENTER, messagebox
 from typing import List
 
@@ -14,6 +14,7 @@ piece_image = []
 list_btn_option = []
 stats_label_list = []
 dice_image = []
+global label_mini_list
 global roll_button
 
 
@@ -31,11 +32,12 @@ class Player:
 
     def show_player_info(self, main_frame, player, color):
         label_id = 0
-        label_mini_list: List[tk.Label] = []
+        global label_mini_list
+        label_mini_list = []
 
         text_font = font.Font(size=17)
 
-        label_mini_list.append(tk.Label(main_frame, text=player[0], fg='white', bg='#655f6a', font=text_font))
+        label_mini_list.append(tk.Label(main_frame, text=player[0], fg='#80ff80', bg='#655f6a', font=text_font))
         label_mini_list[label_id].place(x=15, y=50)
         label_id += 1
 
@@ -297,30 +299,32 @@ class Player:
                     coloana[0][index].place(x=coloana[1], y=(coloana[2] + poz_id[1] * index))
 
     def exist_move(self, jucator):
+        print("sunt deci exist")
+        if jucator == 1:
+            oponent = 0
+        else:
+            oponent =1
         count = 0
-        pos = []
         if self.all_in_house(jucator) == False:
             if len(dice) > 0:
                 count = 0
-                for index in range(0, len(self.board[jucator])):
-                    pos = self.piece_next_place(jucator, index, 0)
-                    count = len(pos)
-
+                for zar in dice:
+                    for index in range(0, 24):
+                        if len(self.board[jucator][index][0]) > 0:
+                            coloana = index-zar
+                            if coloana>=0 and coloana<24 and len(self.board[oponent][23-coloana][0]) < 2:
+                                count += 1
+                                break
+                    if count != 0:
+                        break
         else:
             if len(dice) > 0:
                 count = 0
                 for index in range(0, len(self.board[jucator])):
                     pos = self.end_piece_life(jucator, index, 0)
-                    count = len(pos)
+                    if len(pos) > 0:
+                        count += 1
 
-        if jucator == 1:
-            pos = self.double_check(0, pos)
-        else:
-            pos = self.double_check(1, pos)
-
-        count = len(pos)
-
-        print("MUTARI POSIBILE::", pos)
         if count == 0:
             return False
         else:
@@ -335,23 +339,6 @@ class Player:
             return True
         else:
             return False
-
-    def double_check(self, jucator, next_poz):
-        for index in range(0, len(next_poz)):
-            for coloane in range(0, 24):
-                if len(next_poz) == 0:
-                    break
-                for piece in range(0, len(self.board[jucator][coloane][0])):
-                    if len(next_poz) == 0:
-                        break
-                    coloana_oponent = 23 - next_poz[index][0]
-                    # print(next_poz[index])
-                    # print("debbug::", coloana_oponent)
-                    if coloana_oponent >= 0 and coloana_oponent <= 23:
-                        if len(self.board[jucator][coloana_oponent][0]) > 1:
-                            next_poz.remove(next_poz[index])
-
-        return next_poz
 
     def end_piece_life(self, jucator, x, y):
         next_pos = []
@@ -409,7 +396,6 @@ class Player:
 
                         if verif_last_column == 1:
                             next_pos.append([-5, 0])
-
         else:
             if len(dice) == 2:
                 for index in range(0, len(dice)):
@@ -466,15 +452,8 @@ class Player:
                         if verif_last_column == 1:
                             next_pos.append([-5, 0])
 
-        if len(next_pos) == 0 and y > 0:
+        if len(next_pos) == 0 and y > 0 and self.name[jucator] != "PC":
             messagebox.showerror("Backgammon!!", "You don't have where to move this piece")
-            if self.exist_move(jucator) == False:
-                global turn
-                if jucator == 0:
-                    turn = 1
-                else:
-                    turn = 0
-                roll_button.config(state="normal")
 
         return next_pos
 
@@ -506,8 +485,6 @@ class Player:
                     if len(self.board[1][coord][0]) < 2 and column >= 0:
                         next_pos.append([column, coord_y])
 
-
-
         else:
             if len(dice) == 2:
                 for index in range(0, len(dice)):
@@ -534,15 +511,8 @@ class Player:
                     if len(self.board[0][coord][0]) < 2 and column >= 0:
                         next_pos.append([column, coord_y])
 
-        if len(next_pos) == 0 and y > 0:
+        if len(next_pos) == 0 and y > 0 and self.name[jucator] != "PC":
             messagebox.showerror("Backgammon!!", "You don't have where to move this piece")
-            if self.exist_move(jucator) == False:
-                global turn
-                if jucator == 0:
-                    turn = 1
-                else:
-                    turn = 0
-                roll_button.config(state="normal")
 
         return next_pos
 
@@ -638,10 +608,14 @@ class Player:
         if len(dice) == 0:
             if turn == 0:
                 turn = 1
+                label_mini_list[0].config(fg="white")
+                label_mini_list[1].config(fg="#80ff80")
                 if turn == 1 and self.name[1] == "PC":
                     self.pc_play()
             else:
                 turn = 0
+                label_mini_list[1].config(fg="white")
+                label_mini_list[0].config(fg="#80ff80")
             roll_button.config(state="normal")
 
     def options(self, jucator, x, y):
@@ -656,29 +630,24 @@ class Player:
             next_pos = self.piece_next_place(jucator, x, y)
             for i in range(0, len(next_pos)):
                 if next_pos[i][1] == 15:
-                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" ^ "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
                 else:
-                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" v "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
 
             if len(list_btn_option) > 0:
                 list_btn_option[0].config(command=lambda: self.move_piece(jucator, next_pos[0][0], x))
                 if len(list_btn_option) == 2:
                     list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
-
-                if self.name[jucator] == "PC":
-                    move = random.randrange(0, len(list_btn_option))
-                    list_btn_option[move].invoke()
-
         else:
             next_pos = self.end_piece_life(jucator, x, y)
             for i in range(0, len(next_pos)):
                 if next_pos[i][1] == 15:
-                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" ^ "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=350)
                 elif next_pos[i][1] == 730:
-                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" v "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][next_pos[i][0]][1]), y=430)
                 else:
                     list_btn_option.append(tk.Button(self.main_frame, text="Scoate"))
@@ -698,10 +667,6 @@ class Player:
                         list_btn_option[1].config(command=lambda: self.remove_piece(jucator, x))
                     else:
                         list_btn_option[1].config(command=lambda: self.move_piece(jucator, next_pos[1][0], x))
-
-                if self.name[jucator] == "PC":
-                    move = random.randrange(0, len(list_btn_option))
-                    list_btn_option[move].invoke()
 
     def remove_piece(self, jucator, coloana):
         self.board[jucator][coloana][0][-1].destroy()
@@ -744,10 +709,14 @@ class Player:
             roll_button.config(state="normal")
             if jucator == 0:
                 turn = 1
+                label_mini_list[0].config(fg="white")
+                label_mini_list[1].config(fg="#80ff80")
                 if turn == 1 and self.name[1] == "PC":
                     self.pc_play()
             else:
                 turn = 0
+                label_mini_list[1].config(fg="white")
+                label_mini_list[0].config(fg="#80ff80")
 
     def revive(self, jucator):
         if jucator == 1:
@@ -776,16 +745,20 @@ class Player:
 
             for i in range(0, len(posible_position)):
                 if posible_position[i][1] == 15:
-                    list_btn_option.append(tk.Button(self.main_frame, text="^"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" ^ "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][posible_position[i][0]][1]), y=350)
                 else:
-                    list_btn_option.append(tk.Button(self.main_frame, text="v"))
+                    list_btn_option.append(tk.Button(self.main_frame, text=" v "))
                     list_btn_option[i].place(x=(17 + self.board[jucator][posible_position[i][0]][1]), y=430)
 
             if len(list_btn_option) > 0:
                 list_btn_option[0].config(command=lambda: self.move_piece(jucator, posible_position[0][0], -5))
                 if len(list_btn_option) == 2:
                     list_btn_option[1].config(command=lambda: self.move_piece(jucator, posible_position[1][0], -5))
+
+            if self.name[jucator] == "PC":
+                alegere = random.randrange(0,len(list_btn_option))
+                list_btn_option[alegere].invoke()
 
     def move(self, jucator, x, y):
         global turn, dice
@@ -803,8 +776,10 @@ class Player:
                 if len(dice) == 0 or self.exist_move(jucator) == False:
                     roll_button.config(state="normal")
                     turn = 1
-                    # if turn == 1 and self.name[1] == "PC":
-                    #     self.pc_play()
+                    label_mini_list[0].config(fg="white")
+                    label_mini_list[1].config(fg="#80ff80")
+                    if turn == 1 and self.name[1] == "PC":
+                        self.pc_play()
                     dice = []
 
         elif turn == 1 and len(dice) > 0:
@@ -813,82 +788,144 @@ class Player:
             else:
                 if self.stats[jucator][0] == 0:
                     self.options(jucator, x, y)
-                elif self.name[1] != "PC":
+                else:
                     messagebox.showinfo("Backgammon!!",
                                         "You can't move pieces.\nYou have to get the eliminated ones on the board first.")
 
                 if len(dice) == 0 or self.exist_move(jucator) == False:
                     roll_button.config(state="normal")
                     turn = 0
+                    label_mini_list[1].config(fg="white")
+                    label_mini_list[0].config(fg="#80ff80")
                     dice = []
 
         else:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
-            roll_button.config(state="normal")
 
-    def pc_option(self, x, y):
-        # global list_btn_option
-        # if len(list_btn_option) > 0:
-        #     for btn in list_btn_option:
-        #         btn.destroy()
-        #     list_btn_option = []
-        global turn, roll_button, dice
-        if self.all_in_house(1) == False:
-            for i in range(0, len(dice)):
-                next_pos = self.piece_next_place(1, x, y)
-                if len(next_pos) > 0:
-                    move = random.randrange(0, len(next_pos))
-                    self.update_board(1, x, next_pos[move][0])
-                    sleep(1)
+    def pc_move(self):
+        print("PC:: move")
+        global turn, dice, roll_button
+        if turn == 1 and self.name[turn] == "PC" and len(dice) > 0:
+            if self.stats[1][0] == 0 and self.exist_move(1) == True:
+                global list_btn_option
+                if len(list_btn_option) > 0:
+                    for btn in list_btn_option:
+                        btn.destroy()
+                    list_btn_option = []
 
-                    if x != -5:
-                        val_zar = x - next_pos[move][0]
-                        print(val_zar)
-                        dice.remove(val_zar)
-                    else:
-                        val_zar = next_pos[move][0] + 1
-                        print(val_zar)
-                        dice.remove(val_zar)
-                        self.stats[1][0] -= 1
-                        self.show_player_stats(self.main_frame, self.stats)
-                        if self.stats[1][0] > 0 and len(dice) > 0:
-                            self.revive(1)
-                if len(dice) == 0:
-                    turn = 0
-                    dice = []
-                    roll_button.config(state="normal")
-                    break;
+                print("PC:: aleg piesa")
+                valabile = []
+                for i in range(0, 24):
+                    print("PC:: inca aleg ....")
+                    if len(self.board[1][i][0]) > 0:
+                        valabile.append(i)
+
+                print("PC:: aleg din:", valabile)
+                print("PC:: verific alegerea ....")
+                id = random.randrange(0, len(valabile))
+                x = valabile[id]
+                while len(self.board[0][23-x][0]) > 1 or len(self.board[1][x][0]) == 0 or x<0 or x>23:
+                    id = random.randrange(0, len(valabile))
+                    x = valabile[id]
+
+                print("PC:: am ales piesa")
+
+                if x <= 11:
+                    y = 730
+                else:
+                    y = 15
+
+                if self.all_in_house(1) == False:
+                    next_pos = self.piece_next_place(1, x, y)
+                    for i in range(0, len(next_pos)):
+                        if next_pos[i][1] == 15:
+                            list_btn_option.append(tk.Button(self.main_frame, text=" ^ "))
+                            list_btn_option[i].place(x=(17 + self.board[1][next_pos[i][0]][1]), y=350)
+                        else:
+                            list_btn_option.append(tk.Button(self.main_frame, text=" v "))
+                            list_btn_option[i].place(x=(17 + self.board[1][next_pos[i][0]][1]), y=430)
+
+                    if len(list_btn_option) > 0:
+                        list_btn_option[0].config(command=lambda: self.move_piece(1, next_pos[0][0], x))
+                        if len(list_btn_option) == 2:
+                            list_btn_option[1].config(command=lambda: self.move_piece(1, next_pos[1][0], x))
+
+                        if self.name[1] == "PC":
+                            move = random.randrange(0, len(list_btn_option))
+                            list_btn_option[move].invoke()
+
+                        print("PC:: am mutat")
+
+                else:
+                    next_pos = self.end_piece_life(1, x, y)
+                    for i in range(0, len(next_pos)):
+                        if next_pos[i][1] == 15:
+                            list_btn_option.append(tk.Button(self.main_frame, text=" ^ "))
+                            list_btn_option[i].place(x=(17 + self.board[1][next_pos[i][0]][1]), y=350)
+                        elif next_pos[i][1] == 730:
+                            list_btn_option.append(tk.Button(self.main_frame, text=" v "))
+                            list_btn_option[i].place(x=(17 + self.board[1][next_pos[i][0]][1]), y=430)
+                        else:
+                            list_btn_option.append(tk.Button(self.main_frame, text="Scoate"))
+                            if turn == 0:
+                                list_btn_option[i].place(x=12, y=560)
+                            else:
+                                list_btn_option[i].place(x=1133, y=560)
+
+                    if len(list_btn_option) > 0:
+                        if list_btn_option[0]["text"] == "Scoate":
+                            list_btn_option[0].config(command=lambda: self.remove_piece(1, x))
+                        else:
+                            list_btn_option[0].config(command=lambda: self.move_piece(1, next_pos[0][0], x))
+
+                        if len(list_btn_option) == 2:
+                            if list_btn_option[1]["text"] == "Scoate":
+                                list_btn_option[1].config(command=lambda: self.remove_piece(1, x))
+                            else:
+                                list_btn_option[1].config(command=lambda: self.move_piece(1, next_pos[1][0], x))
+
+                        if self.name[1] == "PC":
+                            move = random.randrange(0, len(list_btn_option))
+                            list_btn_option[move].invoke()
+
+                        print("PC:: am scos piesa")
 
 
+        if len(dice) > 0:
+            self.pc_move()
+        elif self.exist_move(1) == False:
+            dice = []
+            self.pc_move()
         else:
-            next_pos = self.end_piece_life(1, x, y)
+            dice = []
+            roll_button.config(state="normal")
+            turn = 0
+            label_mini_list[1].config(fg="white")
+            label_mini_list[0].config(fg="#80ff80")
+
 
     def pc_play(self):
+        label_mini_list[0].config(fg="white")
+        label_mini_list[1].config(fg="#80ff80")
+
         print("SUNT PC")
-        global turn, dice_image, dice
+        global turn, dice, roll_button, dice_image
         dice = []
         roll_dice(self.main_frame, dice_image, self)
         print("PC::", dice)
 
-        zaruri = len(dice)
-        for i in range(0, zaruri):
+        self.pc_move()
 
-            for j in range(0, len(self.board[1])):
-                print("ZARUUU::", i, len(dice), dice[i])
-                if (23 - j + dice[i]) >= 0 and (23 - j + dice[i]) <= 23 and len(self.board[1][j][0]) != 0 and len(
-                        self.board[0][23 - j + dice[i]][0]) < 2:
-                    coloana_luat = j
+        # apelez functia care imi arata optiunile
+        # aleg random una din ele
+        # mut, elimin zarul
+        # daca dice nu e null repet
 
-            self.board[1][coloana_luat][0][-1].invoke()
-
-            zaruri = len(dice)
-
-            if zaruri == 0:
-                break
-
-        roll_button.config(state="normal")
         dice = []
+        roll_button.config(state="normal")
         turn = 0
+        label_mini_list[1].config(fg="white")
+        label_mini_list[0].config(fg="#80ff80")
 
 
 # END CLASS
@@ -904,8 +941,8 @@ def who_won(player):
 
 
 def roll_dice(main_frame, dice_image, player):
+    time.sleep(0.5)
     global dice
-    dice = []
     zar1 = random.randrange(1, 7)
     zar2 = random.randrange(1, 7)
     if zar1 == zar2:
@@ -945,23 +982,22 @@ def roll_dice(main_frame, dice_image, player):
         if len(dice) == 0:
             if turn == 0:
                 turn = 1
+                label_mini_list[0].config(fg="white")
+                label_mini_list[1].config(fg="#80ff80")
                 if turn == 1 and player.name[1] == "PC":
                     player.pc_play()
             else:
                 turn = 0
+                label_mini_list[1].config(fg="white")
+                label_mini_list[0].config(fg="#80ff80")
 
     if player.exist_move(turn) == False:
         roll_button.config(state="normal")
-        if turn == 0:
-            turn = 1
-            if turn == 1 and player.name[1] == "PC":
-                player.pc_play()
-        else:
-            turn = 0
 
 
 def show_winner(window, id, player, roll_button):
     roll_button.config(state="disabled")
+    time.sleep(1)
     if id == 1:
         text = player.name[0]
     else:
