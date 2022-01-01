@@ -4,6 +4,8 @@ import webbrowser
 import tkinter as tk
 from tkinter import font, CENTER, messagebox
 from typing import List
+import sys
+
 
 # TO DO: adauga comentarii si ctrl+alt+l
 
@@ -29,6 +31,7 @@ class Player:
         self.label_list = self.show_player_info(main_frame, self.name, self.color)
         self.show_player_stats(main_frame, self.stats)
         self.board = self.init_board(main_frame, self.color)
+
 
     def show_player_info(self, main_frame, player, color):
         label_id = 0
@@ -299,7 +302,6 @@ class Player:
                     coloana[0][index].place(x=coloana[1], y=(coloana[2] + poz_id[1] * index))
 
     def exist_move(self, jucator):
-        print("sunt deci exist")
         if jucator == 1:
             oponent = 0
         else:
@@ -803,7 +805,6 @@ class Player:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
     def pc_move(self):
-        print("PC:: move")
         global turn, dice, roll_button
         if turn == 1 and self.name[turn] == "PC" and len(dice) > 0:
             if self.stats[1][0] == 0 and self.exist_move(1) == True:
@@ -816,7 +817,6 @@ class Player:
                 print("PC:: aleg piesa")
                 valabile = []
                 for i in range(0, 24):
-                    print("PC:: inca aleg ....")
                     if len(self.board[1][i][0]) > 0:
                         valabile.append(i)
 
@@ -1138,8 +1138,12 @@ def create_window():
     window.eval('tk::PlaceWindow . center')
     return window
 
+class NoDevSupport:
+    def write(self, msg):
+        pass
 
 def main():
+    sys.stderr = NoDevSupport()
     window = create_window()
     main_menu(window)
     window.mainloop()
