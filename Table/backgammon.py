@@ -22,12 +22,19 @@ global roll_button
 class Game:
     """
         This class contains almost all methods needed to play backgammon in 2 players or in player vs pc mode.
-        For more information, check each method down below!
+
+        Here are some videos that show how this app works:
+        https://youtu.be/ml5f4amx1wM
+        https://youtu.be/utUk00iJC-I
+        https://youtu.be/ZC16NrcVrdM
+
+        For more information about the code, check each method down below!
     """
 
     def __init__(self, window, main_frame, player1, player2) -> None:
         """
         This method acts as the class constructor. The main purpose is to initialise and start the game.
+
         :param window: the window in which we see and play the game, used for displaying widgets
         :param main_frame: the frame attached to the window where we put the widgets
         :param player1: the name of the player that starts the game (always "player 1")
@@ -47,11 +54,16 @@ class Game:
     def show_player_info(main_frame, player, color):
         """
         Here we create labels with the name of the players, prepare labels to show their statuses and display each
-        player color
+        player color.
+        The eliminated pieces label keeps track of the pieces 'eaten' by the opponent, while taken out pieces keeps
+        track of the pieces that are taken out from the player's house.
+
         :param main_frame: the frame attached to the window where we put the widgets
-        :param player:
-        :param color:
-        :return:
+        :param player: the list that contains players name, can be either ["player 1", "player 2"], either
+        ["player 1", "PC"]
+        :param color: list containing the path for the piece color for each player, looks like:
+        ["assets/color1.png", "assets/color2.png"]
+        :return: None
         """
         label_id = 0
         global label_mini_list
@@ -111,6 +123,16 @@ class Game:
 
     @staticmethod
     def show_player_stats(main_frame, player_stats):
+        """
+        In this method the statistics about players are updated. If they were not yet shown on the screen, then it is
+        done so and if they are already on the screen, when needed this method will destroy the latest label with the
+        statistics and create new ones which are added in maine_frame.
+
+        :param main_frame: the frame attached to the window where we put the widgets
+        :param player_stats: list where player info is stored; the list looks like:
+        [[eliminated_pieces_player1, taken_out_pieces_player1], [eliminated_pieces_player2, taken_out_pieces_player2]]
+        :return: None
+        """
         global stats_label_list
         stats_label_id = 0
 
@@ -149,6 +171,13 @@ class Game:
 
     @staticmethod
     def color_choosing():
+        """
+        Here will be generated 2 random colors which represent the color that each player will have for
+        the current game.
+        Before returning the colors, this method checks to see if the players have different colors.
+
+        :return: a list with the path to the piece image with the corresponding color to those generated
+        """
         a = random.randint(1, 9)
         b = random.randint(1, 9)
         while b == a or (a == 1 and b == 2) or (a == 2 and b == 3) or (a == 2 and b == 1) or (a == 3 and b == 2):
@@ -196,6 +225,24 @@ class Game:
         return color_path
 
     def init_board_player(self, main_frame, piece, coord_a, coord_b, poz, player_id):
+        """
+        This method creates a list for a player that contains 24 lists representing data about each column on the table
+        for the respective player.
+        A column is represented as a list and contains 3 elements: a list with pieces, and 2 coordinates: the x and y.
+        The list with pieces contains tk.Button elements which are the pieces on that column.
+        The method centers around creating those 24 columns and adding them to the player board.
+        After the list was created, the buttons are placed on the screen for the player to see.
+        Because this method is called only twice (once for each player), the buttons won't overlay on top of each other.
+
+        :param main_frame: the frame attached to the window where we put the widgets
+        :param piece: the path to the piece color for the current player
+        :param coord_a: the y coordinates that shows if the player piece is on the upper or lower spots / columns.
+        :param coord_b: the y coordinates that shows if the player piece is on the upper or lower spots / columns.
+        :param poz: the list that contains spacing between pieces info; it is 65 if the pieces are on the upper spots
+        and -65 on the lower spots; this list is needed for the function used to place the pieces on the board
+        :param player_id: the id of the player (either 0 or 1), as the elements in a list
+        :return: the board with pieces for the current player
+        """
         board_player = []
         column = [[], 970, coord_a]
         board_player.append(column)
@@ -275,6 +322,13 @@ class Game:
         return board_player
 
     def init_board(self, main_frame):
+        """
+        This method calls init_board_player for each player and creates the board list containing most of the game
+        information.
+
+        :param main_frame: the frame attached to the window where we put the widgets
+        :return: the board represented as a list
+        """
         board_1 = self.init_board_player(main_frame, piece_image[0], 15, 730, [65, -65], 0)
         board_2 = self.init_board_player(main_frame, piece_image[1], 730, 15, [-65, 65], 1)
 
@@ -283,6 +337,16 @@ class Game:
 
     @staticmethod
     def replace_piece(column, id_column, replace_type):
+        """
+        This method rearranges pies on the column so that they won't overlap with pieces from other player and won't
+        go on top of the dices, or the option button or any other widget.
+
+        :param column: the player board
+        :param id_column: the column to be rearranged
+        :param replace_type: 0 - more than 5 pieces, need to be placed according to a ratio (pieces will overlap but
+        aesthetically) or 1 - less than 5 pieces, can stay one after the other
+        :return: None
+        """
         global turn
         if replace_type == 0:
             if turn == 1:
@@ -313,6 +377,13 @@ class Game:
                     column[0][index].place(x=column[1], y=(column[2] + poz_id[1] * index))
 
     def exist_move(self, player_id):
+        """
+        Here we check if the player has any move disposable with any of its pieces.
+        Two scenarios were taken: with all pieces in the house, and with pieces scattered all over the board.
+
+        :param player_id: the player id as index for board list
+        :return: True / False (if the player has any move left)
+        """
         if player_id == 1:
             enemy = 0
         else:
@@ -354,6 +425,12 @@ class Game:
             return True
 
     def all_in_house(self, player_id):
+        """
+        This method checks if the pieces of a player are all in his house.
+
+        :param player_id: the player id as it is in the board list (0 - player 1; 1 - player 2 / PC)
+        :return: True / False (answer if the pieces of a player are all in his house)
+        """
         count = 0
         if self.stats[player_id][0] == 0:
             for column in range(6, 24):
@@ -364,6 +441,18 @@ class Game:
             return False
 
     def end_piece_life(self, player_id, x, y):
+        """
+        This method is the same as 'piece_next_place' but for the case when the piece can be removed because the player
+        has all it's pieces inside the house.
+        Besides what 'piece_next_place' does, this method will insert in the list position for the pieces that can be
+        taken out like [-5, 0], where -5 is a code that indicates that the piece will be taken out and 0 means that it
+        will not be replaced on the board.
+
+        :param player_id: the player id as index for board list
+        :param x: column id based on which player turn it is
+        :param y: coordinates to know if the column is on top or on bottom of the game board
+        :return: list containing next position possible for one piece based on the dice rolled
+        """
         next_pos = []
         if player_id == 0:
             if len(dice) == 2:
@@ -481,6 +570,17 @@ class Game:
         return next_pos
 
     def piece_next_place(self, player_id, x, y):
+        """
+        This method starts with an empty list that will end up being populated by the next position where the piece
+        selected can be moved to.
+        Basically this method will calculate where a piece should be moved with all dice values available
+        and then check if the column is available. If it is, the the coordinates are then inserted into the list.
+
+        :param player_id: the player id as index for board list
+        :param x: column id based on which player turn it is
+        :param y: coordinates to know if the column is on top or on bottom of the game board
+        :return: list containing next position possible for one piece based on the dice rolled
+        """
         next_pos = []
         if player_id == 0:
             if len(dice) == 2:
@@ -540,6 +640,25 @@ class Game:
         return next_pos
 
     def update_board(self, player_id, column_taken, column_pus):
+        """
+        Based on the player that moved, first will be set the enemy and a poz_id list that helps with placing the
+        buttons for the pieces on the board.
+
+        First it is checked if the piece was moved from a column to another (such that the piece was not taken out).
+        The piece is then destroyed and placed somewhere else on the board and in the board list.
+        Based on how many pieces are already on that column the call for rearranging the pieces will be done in 2 ways
+        (more info in 'replace_piece' method). This applies for both columns (the one that was taken from and the one
+        to which the piece was moved).
+        If the player has all pieces in house, then the piece will only be destroyed and the dice value removed.
+
+        In the end it is checked if the column on which the piece was put had any of the enemy's pieces. In this case
+        the enemy piece will get 'eaten', destroyed and the statistics updated.
+
+        :param player_id: the player id as index for board list
+        :param column_taken: the column from which a piece was taken
+        :param column_pus: the column to which a piece was moved
+        :return: None
+        """
         if player_id == 1:
             enemy = 0
             poz_id = [-65, 65]
@@ -608,6 +727,20 @@ class Game:
             self.show_player_stats(self.main_frame, self.stats)
 
     def move_piece(self, player_id, column, taken):
+        """
+        This method will move the pieces around. First the option buttons will be removed from the board and destroyed
+        so the board is kept clean. Then the board is updated using the 'update_board' method.
+
+        Then it is searched for the dice value that lead up to this move and once it is found, it will be deleted from
+        the dice list.
+
+        In the end the game prepares itself for the turn of the next player.
+
+        :param player_id: the player id as index for board list
+        :param column: the column where the piece will be moved
+        :param taken: the column from which the piece was taken
+        :return: None
+        """
         global list_btn_option
         for btn in list_btn_option:
             btn.destroy()
@@ -641,6 +774,24 @@ class Game:
             roll_button.config(state="normal")
 
     def options(self, player_id, x, y):
+        """
+        Ths method takes the options where one can move a selected piece and shows them which they are.
+        First it is checked if the player has clicked on another piece before without moving it. If he done so then he
+        will receive an information box that the piece previously selected will be deselected.
+
+        If there are any moves possible then: it is checked if the pieces are all in house or not.
+        If the pieces are not all in house then buttons over some columns will pop up indicating the column on which
+        the selected piece can be moved to. If the pieces are all in house, besides showing where they can be moved
+        further, there is a chance for a button "Take out" to pop up. This button will appear on the bottom of the side
+        of the respective player.
+
+        Then the scene is prepared for the next player's turn.
+
+        :param player_id: the player id as index for board list
+        :param x: column id based on which player turn it is
+        :param y: coordinates to know if the column is on top or on bottom of the game board
+        :return: None
+        """
         global list_btn_option, turn, dice
         if len(list_btn_option) > 0:
             messagebox.showinfo("Backgammon!!", "The piece selected previously will be deselected")
@@ -723,6 +874,20 @@ class Game:
             roll_button.config(state="normal")
 
     def remove_piece(self, player_id, column):
+        """
+        This method addresses only to the pieces "eaten" by the other player.
+        When a piece gets eaten, it will be removed from board and the count for eliminated pieces for that player
+        will go up.
+        After the piece gets eliminated we need to find what number on the dice led to this move so we can remove it.
+        Then we destroy the option buttons that showed the player where he could move the piece selected.
+        The statistics are updated on the screen.
+        It is then checked if either of the players won the game.
+        The if the numbers on the dice were all used up the game will be prepared for the next player.
+
+        :param player_id: the player id as index for board list
+        :param column: column number to know from where the piece is removed
+        :return: None
+        """
         self.board[player_id][column][0][-1].destroy()
         self.board[player_id][column][0].pop()
         self.stats[player_id][1] += 1
@@ -771,6 +936,20 @@ class Game:
                 label_mini_list[0].config(fg="#80ff80")
 
     def revive(self, player_id):
+        """
+        This method takes the player id to get to know which player it should "revive".
+        Depending on which player turn's it is, this method will generate some coordinates based on which it will
+        place the piece on the board.
+
+        Based on what dice the player rolled, this method will suggest to the player which columns he can use to put
+        his piece on.
+
+        When clicked, the button will call 'move_piece' method that will move the piece to the designated column.
+        More info about how moving pieces works at 'move_piece' method.
+
+        :param player_id: the id of the player as it is stored in the board list (0 - player 1; 1 - player 2 / PC)
+        :return: None
+        """
         if player_id == 1:
             other_player = 0
             coord_y = 15
@@ -813,6 +992,14 @@ class Game:
                 list_btn_option[choice].invoke()
 
     def move(self, player_id, x, y):
+        """
+        This method will call the methods needed for playing the actual turn, but before that it will run some
+        verification based on which it may show some 'error' or 'info' boxes, both with informational purposes.
+        :param player_id: the id of the player as it is stored in the board list (0 - player 1; 1 - player 2 / PC)
+        :param x: column id based on which player turn it is
+        :param y: coordinates to know if the column is on top or on bottom of the game board
+        :return: None
+        """
         global turn, dice
 
         if turn == 0 and len(dice) > 0:
@@ -841,6 +1028,26 @@ class Game:
             messagebox.showerror("Backgammon!!", "You must roll the dice first")
 
     def pc_move(self):
+        """
+        This method is meant for the PC.
+        First we check to be sure that the turn and player match. Then if the PC has any eliminated pieces, those will
+        be addressed first. It is checked if any of the columns of the opponent house are free and also corresponding
+        to the dice. If so the piece will be "revived" and checked once again if it has any eliminated pieces.
+
+        If there are no (more) eliminated pieces and PC still has dice number not used then he can move pieces to his
+        house.
+
+        When moving pieces: it is checked which columns the player has pieces on and added in a list. Then from that
+        list is extracted a random number and from that column will be moved a piece with a random dice from those
+        in the dice list. It is checked then if the move can actually be done and if it is all good then the move is
+        executed. If not the algorithm will repeat itself until it can make a move.
+        Obviously before trying to do a move it is checked to see if there is any move possible.
+
+        When no (more) moves are available the game shifts the turn to the other player: changes turn, changes state
+        for roll button in normal and removes all from dice list.
+
+        :return: None
+        """
         global turn, dice, roll_button
         if turn == 1 and self.name[turn] == "PC" and len(dice) > 0:
             if self.stats[1][0] == 0:
@@ -931,6 +1138,18 @@ class Game:
             label_mini_list[0].config(fg="#80ff80")
 
     def pc_play(self):
+        """
+        This method starts the turn for the PC.
+        First the label colors are changed to show which player turn it is (because PC moves too fast we can't
+        actually see much of a difference).
+        Then the dice is rolled.
+        Then the 'pc_move' method is called so that the PC will make some moves (if he can).
+
+        Then the dice list is deleted, roll button is active again, the label colors are reversed so that the
+        next player can start a clean turn.
+
+        :return: None
+        """
         label_mini_list[0].config(fg="white")
         label_mini_list[1].config(fg="#80ff80")
 
@@ -950,6 +1169,14 @@ class Game:
 
 
 def who_won(player):
+    """
+    This method check if any of the players took out 15 pieces. If not then 0 is returned meaning no player has yet won.
+    If a player took out 15 pieces it will return 1 or 2 based on which player won.
+
+    :param player: object of type Game that holds the game information
+    :type player: Game
+    :return: a code number for the player that won (1 - player 1; 2 - player 2 / PC; 0 - none )
+    """
     if player.stats[0][1] == 15:
         return 1
     elif player.stats[1][1] == 15:
@@ -959,6 +1186,21 @@ def who_won(player):
 
 
 def roll_dice(main_frame, player):
+    """
+    This method is called when the dice is rolled. When rolled (because the PC move faster), the dice will wait
+    for 0.5 seconds in the hope that the dice won't be too similar from one turn to another.
+    2 numbers between 1 and 6 are generated randomly, if they are the same then the number will be added 4 times
+    in the dice list. If not, and the numbers are different, then they will be added each only once to the list.
+
+    After the dice for the turn are set, they will be shown to the players as follows: the old dice images for the
+    previous turn are deleted (destroyed) and then are shown the dice for the actual turn.
+    The dice image is saved in a list to know which widgets to destroy in the next turn.
+
+    :param main_frame: the frame attached to the window where we put the widgets
+    :param player: object of type Game that holds the game information
+    :type player: Game
+    :return: None
+    """
     time.sleep(0.5)
     global dice
     zar1 = random.randrange(1, 7)
@@ -1014,6 +1256,18 @@ def roll_dice(main_frame, player):
 
 
 def show_winner(window, id_player, player):
+    """
+    This method shows the winner to both players. If somebody won, this method is called.
+    When called, it creates a small canvas centered on top of the window with all the widgets added lastly,
+    black background and random colored circles to catch the eye of the players that something awesome happened.
+    Finally on top of the circles is shown which player did win.
+
+    :param window: the window in which we see and play the game, used for displaying widgets
+    :param id_player: player id represented as list index (0 - player 1; 1 - player 2 or PC)
+    :param player: object of type Game that holds the game information
+    :type player: Game
+    :return: None
+    """
     roll_button.config(state="disabled")
     time.sleep(1)
     if id_player == 1:
@@ -1047,48 +1301,67 @@ def show_winner(window, id_player, player):
 
 
 def player_gui_init(window):
+    """
+    This method initialises the game between 2 players.
+    It creates a frame on top of the window in which will put as background the board for the game.
+    On top of the background will be added the 'Roll' button and from here the actual playable game will be done via
+    Game class.
+
+    :param window: the window in which we see and play the game, used for displaying widgets
+    :return: None
+    """
     main_frame = tk.Frame(window, width=1200, height=800)
     main_frame.pack(side="top", expand=False, fill="both")
 
-    global background
+    global background, game, dice_image, roll_button
     background = tk.PhotoImage(file="assets/board2.png")
     label_background = tk.Label(main_frame, image=background)
     label_background.place(x=-3, y=-2)
 
-    global game
     game = Game(window, main_frame, "player 1", "player 2")
 
-    global dice_image
     dice_image = []
     text_font = font.Font(size=14)
-    global roll_button
     roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2,
                             command=lambda: roll_dice(main_frame, game))
     roll_button.place(x=360, y=380)
 
 
 def pc_gui_init(window):
+    """
+    This method initialises the game between player and PC.
+    It creates a frame on top of the window in which will put as background the board for the game.
+    On top of the background will be added the 'Roll' button and from here the actual playable game will be done via
+    Game class.
+
+    :param window: the window in which we see and play the game, used for displaying widgets
+    :return: None
+    """
     main_frame = tk.Frame(window, width=1200, height=800)
     main_frame.pack(side="top", expand=False, fill="both")
 
-    global background
+    global background, game, dice_image, roll_button
     background = tk.PhotoImage(file="assets/board2.png")
     label_background = tk.Label(main_frame, image=background)
     label_background.place(x=-3, y=-2)
 
-    global game
     game = Game(window, main_frame, "player 1", "PC")
 
-    global dice_image
     dice_image = []
     text_font = font.Font(size=14)
-    global roll_button
     roll_button = tk.Button(main_frame, text="Roll", font=text_font, bg='#4e555f', fg='white', border=2,
                             command=lambda: roll_dice(main_frame, game))
     roll_button.place(x=360, y=380)
 
 
 def main_menu(window):
+    """
+    This method creates and defines the main menu screen, the first menu and first screen to pop up when we run the app.
+    It adds and background and 3 buttons: 'How to play', 'Player vs Player' and 'Player vs PC'
+
+    :param window: the window in which we see and play the game, used for displaying widgets
+    :return: None
+    """
     main_frame = tk.Frame(window, width=1200, height=800)
     main_frame.pack(side="top", expand=False, fill="both")
 
@@ -1102,6 +1375,12 @@ def main_menu(window):
     text_font = font.Font(size=15)
 
     def help_callback():
+        """
+        When the 'How to play' button is pressed this method is called and opens an wikipedia page for the user to see
+        more information about Backgammon.
+
+        :return: None
+        """
         webbrowser.open("https://en.wikipedia.org/wiki/Backgammon")
 
     button_list.append(tk.Button(main_frame, text="How to play", bg="#c2fcdd", fg="#002e1d", font=text_font,
@@ -1110,6 +1389,14 @@ def main_menu(window):
     button_id += 1
 
     def player_callback(main_window):
+        """
+        This method is called when the "Player vs Player" button is pressed.
+        It creates a new window for the game to assure that widgets won't crawl on top of each other.
+        It calls the 'player_gui_init' method to start the game (more info at that method)
+
+        :param main_window: the window in which we see and play the game, used for displaying widgets
+        :return: None
+        """
         main_window.destroy()
         new_window = create_window()
         player_gui_init(new_window)
@@ -1120,6 +1407,14 @@ def main_menu(window):
     button_id += 1
 
     def pc_callback(main_window):
+        """
+        This method is called when the "Player vs PC" button is pressed.
+        It creates a new window for the game to assure that widgets won't crawl on top of each other.
+        It calls the 'pc_gui_init' method to start the game (more info at that method)
+
+        :param main_window: the window in which we see and play the game, used for displaying widgets
+        :return: None
+        """
         main_window.destroy()
         new_window = create_window()
         pc_gui_init(new_window)
@@ -1135,7 +1430,8 @@ def main_menu(window):
 def create_window():
     """
     Here we will create the window for the game with the proper name and icon.
-    :return: window
+
+    :return: the window in which will be displayed the game
     """
     window = tk.Tk()
     window.title("Backgammon!!")
@@ -1151,11 +1447,38 @@ def create_window():
 
 
 class NoDevSupport:
+    """
+    This class is supposed to do nothing and contains a single method doing just than.
+    It is used to stop the printing of errors and traceback messages in the console.
+    """
+
     def write(self, msg):
+        """
+        This method does nothing much.
+
+        :param msg: a message
+        :return: None
+        """
         pass
 
 
 def main():
+    """
+    The main method of this app, creates the window for the game and calls the main_menu method to get the app running.
+
+    Due to the need to verify at each step if the current player can make any move, there are a considerable number of
+    recursions that add up and because Python has a limit of 1000 recursions sometimes the heap gets full to the max
+    and an error is thrown that tells just that. Even thought an error is thrown, the app does not stop and in the end
+    all of the recursion steps are done and the result is a correct one.
+    (I tried multiple ways of dealing with this situation, but I did not find one that could stop the error from
+    occurring and also let the program run as it should.)
+
+    Because I couldn't find any other way to solve this problem, I decided to let it be as long as it doesn't affect my
+    program in a negative way. Because it was not quite user friendly to throw that much information at once in the
+    console I made the class NoDevSupport to let the system know that when dealing with errors it should not show them.
+    (While testing the app that line was commented to make sure that the program worked as it was supposed to.)
+    :return: None
+    """
     sys.stderr = NoDevSupport()
     window = create_window()
     main_menu(window)
